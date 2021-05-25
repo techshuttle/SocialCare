@@ -247,15 +247,15 @@ def read_name_sentiment(cur,conn):
 #to test our functions
 # if __name__ == '__main__':
 #     import config
-#
-#
+# 
+# 
 #     conn = psycopg2.connect(dbname=config.DB_NAME, user=config.DB_USER, password=config.DB_PASS, host=config.DB_HOST)
 #     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-#
+# 
 #     # sentiment = read_name_sentiment(cur = cur)
-#
+# 
 #     # print(sentiment)
-#
+# 
 #     # import pandas as pd
 #     #
 #     # df = pd.DataFrame(sentiment[1:], columns=("id", "name", "sentiment"))
@@ -263,23 +263,23 @@ def read_name_sentiment(cur,conn):
 #     # HTML_CODE = df.to_html
 #     # print(HTML_CODE)
 #     # alter_table_b()
-#
+# 
 #     # update_Employee_b(id =1 , email = "rajat@gmail.com", conn = conn, cur = cur)
 #     # insert_data_b( id = 1, name = "Rajat", twitter_id = "rajatpaliwal319", linkedin_url = False,conn = conn,cur = cur)
 #     # conn_info =config("db.ini",section='postgresql')
 #     # connect()
-#
+# 
 #     temp = update_sentiment(1,"@rajatpaliwal319",linkedin_url=False, conn=conn , cur = cur)
 #     # temp = insert_twitter_linkedin_sentiment_b(twitter_id = "@rajatpaliwal319", cur = cur, conn = conn, linkedin_sentiment=False)
 #     print(temp)
-#
+# 
 #     # update_sentiment(id = 1, twitter_id = "@rajatpaliwal319", conn = conn, cur = cur, linkedin_url=False)
-#
-#
+# 
+# 
 #     # insert_twitter_linkedin_sentiment_b(twitter_id, cur, conn, linkedin_sentiment=False)
 #     # update_Employee_b(1,"@rajatplaiwal319", conn, cur)
-#
-#
+# 
+# 
 #     #     #create a desired database
 # #     # create_db(conn_info)
 # #
@@ -299,7 +299,7 @@ def read_name_sentiment(cur,conn):
 # #     print(json_output)
 # #     # json_output = json.dumps(get_url_b())
 # #     # print(json_output)
-#
-#
+# 
+# 
 #     conn.close()
 #     cur.close()
