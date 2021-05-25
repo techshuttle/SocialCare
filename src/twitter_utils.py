@@ -1,4 +1,5 @@
 import tweepy
+import config
 import pandas as pd
 import sys
 import numpy as np
@@ -13,19 +14,19 @@ client = ExpertAiClient()
 # load_dotenv()
 
 import os
-os.environ["EAI_USERNAME"] = "rohit.ajaygupta@gmail.com"
-os.environ["EAI_PASSWORD"] ="4!nGb5YxYSZDFQn"
+os.environ["EAI_USERNAME"] = config.expertai_mail
+os.environ["EAI_PASSWORD"] =config.expertai_password
 
-import twitter_config
+
 
 """authentication function"""
 
 def twitter_api():
     try:
-        consumer_key = twitter_config.consumer_key
-        consumer_secret = twitter_config.consumer_secret
-        access_token = twitter_config.access_token
-        access_secret = twitter_config.access_secret
+        consumer_key = config.consumer_key
+        consumer_secret = config.consumer_secret
+        access_token = config.access_token
+        access_secret = config.access_secret
 
     except KeyError:
         sys.stderr.write("TWITTER_* envirnoment variable not set\n")
