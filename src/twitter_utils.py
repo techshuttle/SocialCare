@@ -65,32 +65,13 @@ def tweet_user(username):
     max_tweets = 1
     # Creation of query method using parameters
     tweets = tweepy.Cursor(api.user_timeline,id=username,tweet_mode = 'extended').items(max_tweets)
-    # https://stackoverflow.com/questions/21308762/avoid-twitter-api-limitation-with-tweepy
-    # while True:
-    #     try:
-    #         new_tweet = tweets.next()
-    #         #Insert into db
-    #     except tweepy.TweepError:
-    #         time.sleep(60 * 15)
-    #         continue
-    #     except StopIteration:
-    #         break
-    # tweets_list = [[sentiment(preprocess(tweet.full_text))] for tweet in tweets]
-    # for tweet in tweets:
-    #     return tweet
 
-    tweets = [sentiment(preprocess(tweet.full_text)) for tweet in tweets]
+    tweets_list = [sentiment(preprocess(tweet.full_text)) for tweet in tweets]
     # return tweets
-    for tweet in tweets:
+    for tweet in tweets_list:
         return float(tweet)
 
 api = twitter_api()
 
 
-if __name__ == '__main__':
-    api = twitter_api()
-    users = ['@rajatpaliwal319']
-    for user in users:
-        tweet_user(user)
-        print(type(tweet_user(user)))
 

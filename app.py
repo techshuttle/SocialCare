@@ -9,13 +9,8 @@ import config
 from flask import Flask, request, jsonify
 from src import twitter_utils
 from src import db_utils as db
-from src.db_utils import read_name_sentiment
 from src.send_email import send_mail
 from pretty_html_table import build_table
-
-
-conn = psycopg2.connect(dbname = config.DB_NAME,user = config.DB_USER, password = config.DB_PASS, host = config.DB_HOST)
-cur = conn.cursor(cursor_factory = psycopg2.extras.DictCursor)
 
 
 app = Flask(__name__)
@@ -28,7 +23,7 @@ def get_homepage():
 @app.route("/get_urls", methods=['GET'])
 def get_urls():
     # call database read function to get data urls for each member in database
-    list_urls = db.get_url_b(cur=cur)
+    list_urls = db.get_url()
     result = {"result": []}
     for linkedin, twitter in list_urls:
         result["result"].append({"linkedin": linkedin, "twitter": twitter})
@@ -37,17 +32,11 @@ def get_urls():
 
 @app.route("/add_sentiment", methods=["GET"])
 def add_sentiment():
-    output = request.get_json()
-    # call database update function to add sentiment
-    twitter_sentiment = output["twitter_sentiment"]
-    linkedin_sentiment = output["linkedin_sentiment"]
-
-    list_sentiments = db.insert_twitter_linkedin_sentiment_b(linkedin_sentiment,twitter_id = "@rajatpaliwal319",  cur=cur,conn = conn)
-    if list_sentiments == 1:
+    list_sentiments = db.update_twitter_sentiment_from_ids()
+    if list_sentiments[0] == 1:
         result = {"status": "success"}
     else:
         result = {"status": "failure"}
-
     return jsonify(result)
 
 
@@ -60,7 +49,7 @@ def add_members():
     linkedin_url = data["linkedin_url"]
 
     # call database create/update function to add members
-    add_members = db.insert_data_b(id, name, twitter_id, linkedin_url, cur=cur, conn=conn)
+    add_members = db.insert_data(id, name, twitter_id, linkedin_url)
     if add_members == 1:
         result = {"status": "success"}
     else:
@@ -69,26 +58,16 @@ def add_members():
     return jsonify(result)
 
 
-# converted from Post to get...Done
 @app.route("/get_members", methods=['GET'])
 def read_members():
-    data = request.get_json()
-    # call database read function to send members information
-    list_members= db.query_db("SELECT * FROM Employee", cur=cur)
-    # id = data["id"]
-    # name = data["name"]
-    # twitter_id = data["twitter_id"]
-    # linkedin_url = data["linkedin_url"]
-
-    # result = {"status": 1 ,"id":id ,"name": name, "twitter_id": twitter_id, "linkedin_url": linkedin_url}
+    list_members= db.query_db("SELECT * FROM Employee")
+    print(list_members)
     return jsonify(list_members)
-    # return jsonify(result)
-
 
 
 @app.route("/notify", methods=["GET"])
 def notify():
-    sentiment_data = read_name_sentiment(cur=cur, conn=conn)
+    sentiment_data = db.read_name_sentiment()
     print("sentiment_data", sentiment_data)
     try:
         output = build_table(sentiment_data, 'blue_light')
