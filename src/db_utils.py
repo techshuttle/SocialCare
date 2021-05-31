@@ -69,6 +69,7 @@ def create_table():
 def insert_data(id,name,twitter_id,linkedin_url = False):
 
     twitter_sentiment = tweet_user(twitter_id,max_tweets= 1)
+
     linkedin_url = False
     conn.autocommit = True
     try:
@@ -122,44 +123,13 @@ def get_url(twitter_id):
 # print(get_url(twitter_id = None))
 # print((get_url(twitter_id = "1")))
 
-def read_name_sentiment():
-    """Reading id, name and sentiment of employee from the table"""
 
-    s = """SELECT id,name,twitter_sentiment from Employee;"""
-    cursor.execute(s)
-    employee = cursor.fetchall()
-    # ilog.info(f"The sentiments of the employees are {employee}")
-    conn.commit()
 
-    df = pd.DataFrame(employee[1:], columns=("id", "name", "sentiment"))
-    return df
 
 #Update
 
-def update_twitter_sentiment_from_ids():
-    """updating and checking the update of twitter sentiment for the user"""
-    s = "SELECT twitter_id FROM Employee"
-    cursor.execute(s)
-    twitter_ids = cursor.fetchall()
-    conn.commit()
-    # return twitter_ids
-    list = [update_tweet_sentiment(id[0]) for id in twitter_ids]
-    logger.info(f"list of updated twitter sentiments - {list}")
-    return list
 
 #function useful for API
-def update_twitter_sentiment_pattern_from_ids():
-    """updating and checking the update of twitter sentiment for the user"""
-    s = "SELECT twitter_id FROM Employee"
-    max_tweets = 15
-    cursor.execute(s)
-    twitter_ids = cursor.fetchall()
-    conn.commit()
-    # return twitter_ids
-    list = [get_twitter_sentiment_pattern_from_ids(id[0]) for id in twitter_ids]
-    logger.info(f"list of updated twitter sentiments - {list}")
-    return list
-
 
 
 def get_twitter_sentiment_pattern_from_ids(twitter_id):
@@ -173,23 +143,41 @@ def get_twitter_sentiment_pattern_from_ids(twitter_id):
         return 0
     return 1
 
-# a = update_twitter_sentiment_pattern_from_ids()
+# a = get_twitter_sentiment_pattern_from_ids("@kunalb11")
 # print(a)
 
 
 def update_tweet_sentiment(twitter_id):
     twitter_sentiment = (tweet_user(twitter_id,1))
+    # tweet_sentiment = (tweet_user(twitter_id, 1))
+    print(twitter_sentiment)
     try:
-        cursor.execute("""UPDATE Employee SET twitter_sentiment = %s WHERE twitter_id = %s """,(twitter_sentiment, twitter_id))
+        sentiment = cursor.execute("""UPDATE Employee SET twitter_sentiment = %s WHERE twitter_id = %s """,(twitter_sentiment, twitter_id ))
         logger.info(f"twitter sentiment for {twitter_id} updated successfully")
     except Exception as error:
         logger.error(f"{error}")
-        return 0
-    return 1
+        return print(error)
+    return sentiment
+
+# print(update_tweet_sentiment("@kunalb11"))
+
+def update_twitter_sentiment_from_ids():
+    """updating and checking the update of twitter sentiment for the user"""
+    s = "SELECT twitter_id FROM Employee"
+    cursor.execute(s)
+    twitter_ids = cursor.fetchall()
+    print(twitter_ids)
+    conn.commit()
+    # return twitter_ids
+    list = [update_tweet_sentiment(id[0]) for id in twitter_ids]
+    logger.info(f"list of updated twitter sentiments - {list}")
+    return list
+
+# print(update_twitter_sentiment_from_ids())
 
 
 def update_twitter_linkedin_sentiment(twitter_id,linkedin_sentiment = False):
-    twitter_sentiment = tweet_user(twitter_id)
+    twitter_sentiment = tweet_user(twitter_id,1)
     linkedin_sentiment = False
     logger.info(f"{twitter_sentiment} to be updated")
     try:
@@ -202,18 +190,34 @@ def update_twitter_linkedin_sentiment(twitter_id,linkedin_sentiment = False):
         return 0
     return 1
 
-#Delete
+def update_twitter_sentiment_pattern_from_ids():
+    """updating and checking the update of twitter sentiment for the user"""
+    s = "SELECT twitter_id FROM Employee"
+    max_tweets = 15
+    cursor.execute(s)
+    twitter_ids = cursor.fetchall()
+    conn.commit()
+    # return twitter_ids
+    list = [get_twitter_sentiment_pattern_from_ids(id[0]) for id in twitter_ids]
+    logger.info(f"list of updated twitter sentiments - {list}")
+    return list
 
-def delete_records(name):
-    sql_delete = "DELETE FROM Employee WHERE name = name"
+
+#Delete
+######## Warning......deletes all data
+def delete_records(twitter_id):
+    sql_delete = "DELETE FROM Employee WHERE twitter_id = twitter_id"
     try:
         # conn.autocommit = True
         cursor.execute(sql_delete)
-        logger.info(f"{name} successfully deleted from Employee.")
+        logger.info(f"{twitter_id} successfully deleted from Employee.")
     except:
-        logger.warn(f"could not delete {name} from Employee.")
+        logger.warn(f"could not delete {twitter_id} from Employee.")
         return 0
     return 1
+
+# print(delete_records("@tandulkar"))
+
 
 #Other useful functions
 
@@ -234,8 +238,22 @@ def query_db(query,args=(), one=False):
 
 def alter_table():
     """ to add new column or delete a column to and from the table"""
-    cursor.execute("""ALTER TABLE Employee ADD COLUMN twitter_sentiment_pattern VARCHAR(30); """)
+    # cursor.execute("""ALTER TABLE Employee ADD COLUMN twitter_sentiment_pattern VARCHAR(30); """)
+    cursor.execute("ALTER TABLE Employee ADD tweet_sentiment INT;")
     logger.info("Alter table successful")
 
 # alter_table()
+
+#read name and sentiment
+def read_name_sentiment():
+    """Reading id, name and sentiment of employee from the table"""
+
+    s = """SELECT id,name,twitter_sentiment from Employee;"""
+    cursor.execute(s)
+    employee = cursor.fetchall()
+    # ilog.info(f"The sentiments of the employees are {employee}")
+    conn.commit()
+
+    df = pd.DataFrame(employee[1:], columns=("id", "name", "sentiment"))
+    return df
 

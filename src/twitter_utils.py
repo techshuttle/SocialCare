@@ -60,18 +60,22 @@ def preprocess(tweet):
     return sent
 
 
-def tweet_user(username):
+def tweet_user(username,max_tweets):
     """Extracting user information"""
-    max_tweets = 1
     # Creation of query method using parameters
     tweets = tweepy.Cursor(api.user_timeline,id=username,tweet_mode = 'extended').items(max_tweets)
 
     tweets_list = [sentiment(preprocess(tweet.full_text)) for tweet in tweets]
-    # return tweets
-    for tweet in tweets_list:
-        return float(tweet)
+    if max_tweets == 1:
+        for tweet in tweets_list:
+            return float(tweet)
+    if max_tweets > 1:
+        sentiment_pattern = [0 if tweet < 0 else 1 for tweet in tweets_list]
+        return str(sentiment_pattern)
+
 
 api = twitter_api()
 
-
-
+if __name__ == '__main__':
+    a = tweet_user("@rajatpaliwal319", 1)
+    print(a)
