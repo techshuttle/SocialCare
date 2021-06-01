@@ -12,6 +12,10 @@ from src import twitter_utils
 from src import db_utils as db
 from src.send_email import send_mail
 from pretty_html_table import build_table
+from apscheduler.schedulers.background import BackgroundScheduler
+
+sched = BackgroundScheduler(daemon =True)
+sched.start()
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -55,7 +59,7 @@ def get_urls():
 
 @app.route("/add_sentiment", methods=[ "POST"])
 def add_sentiment():
-    list_sentiments = db.update_twitter_sentiment_from_ids()
+    list_sentiments = db.update_tweet_sentiment_from_ids()
     logger.info(f"status of sentiments {list_sentiments}")
     if list_sentiments[0] == 1:
         result = {"status": "success"}
@@ -100,7 +104,8 @@ def get_members():
     # return jsonify(list_members)
 
 
-@app.route("/notify", methods=["GET"])
+# @app.route("/notify", methods=["GET"])
+@sched.scheduled_job(trigger= 'cron',day = '*')
 def notify():
     sentiment_data = db.read_name_sentiment()
     logger.info(f"mailing sentiment data for {sentiment_data}")
