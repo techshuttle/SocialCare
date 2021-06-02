@@ -22,3 +22,4 @@ def send_mail(body):
     server.login(message['From'], config.password)
     server.sendmail(message['From'], message['To'], msg_body)
     server.quit()
+

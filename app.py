@@ -39,8 +39,9 @@ app = Flask(__name__)
 
 @app.route("/", methods=['GET'])
 def get_homepage():
-    return jsonify({"Result": "Success"})
     logger.info("homepage successful")
+    return jsonify({"Result": "Success"})
+
 
 @app.route("/get_urls", methods=['GET'])
 def get_urls():

@@ -227,7 +227,7 @@ def update_tweet_sentiment_pattern_from_ids():
 #Delete
 ######## Warning......deletes all data
 def delete_records(twitter_id):
-    sql_delete = "DELETE FROM Employee WHERE twitter_id = twitter_id"
+    sql_delete = "DELETE FROM Employee WHERE twitter_id = %s",(twitter_id)
     try:
         # conn.autocommit = True
         cursor.execute(sql_delete)
