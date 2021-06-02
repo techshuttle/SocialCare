@@ -45,15 +45,15 @@ def get_homepage():
 
 @app.route("/get_urls", methods=['GET'])
 def get_urls():
-    # data = request.get_json()
-    # print(data)
-    # for member in data:
-    #     twitter_id = member["twitter_id"]
-    # logger.info(f"{data} is our data for get_urls")
+    data = request.get_json()
     result = {"result": []}
-    list_urls = db.get_url(twitter_id = None)
-    for id, twitter,linkedin in list_urls:
+    twitter_id = data["twitter_id"]
+    list_urls = db.get_url(twitter_id=twitter_id)
+    for id, twitter, linkedin in list_urls:
         result["result"].append({"id": id, "linkedin": linkedin, "twitter": twitter})
+    logger.info(f"{data} is our data for get_urls")
+    # result = {"result": []}
+
     logger.info("urls read successfully")
     return jsonify(result=result)
 

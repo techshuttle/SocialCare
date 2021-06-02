@@ -29,31 +29,14 @@ logger.addHandler(file_handler)
 #
 # dblog = setup_logger("db_logger", "../logs/db_logfile.log")
 
-#
-# def conn_local():
-#     """returns connection and cursor"""
-#     conn = psycopg2.connect(
-#                 database =config.DB_NAME,
-#                 user = config.DB_USER,
-#                 password = config.DB_PASS,
-#                 host = config.DB_HOST
-#     )
-#     conn.autocommit = True
-#     cursor = conn.cursor()
-#     logger.info("postgres connection Successful")
-#     return conn, cursor
-#
-# conn, cursor = conn()
 
-#Heroku database
 def conn():
     """returns connection and cursor"""
     conn = psycopg2.connect(
-                database =config.DB_NAME_h,
-                user = config.DB_USER_h,
-                password = config.DB_PASS_h,
-                host = config.DB_HOST_h,
-                sslmode='require'
+                database =config.DB_NAME,
+                user = config.DB_USER,
+                password = config.DB_PASS,
+                host = config.DB_HOST
     )
     conn.autocommit = True
     cursor = conn.cursor()
@@ -61,6 +44,23 @@ def conn():
     return conn, cursor
 
 conn, cursor = conn()
+
+# #Heroku database
+# def conn():
+#     """returns connection and cursor"""
+#     conn = psycopg2.connect(
+#                 database =config.DB_NAME_h,
+#                 user = config.DB_USER_h,
+#                 password = config.DB_PASS_h,
+#                 host = config.DB_HOST_h,
+#                 sslmode='require'
+#     )
+#     conn.autocommit = True
+#     cursor = conn.cursor()
+#     logger.info("postgres connection Successful")
+#     return conn, cursor
+
+# conn, cursor = conn()
 # print(conn,cursor)
 
 
@@ -122,7 +122,7 @@ def read_record(twitter_id):
         # print(urls)
         return urls
 
-print(read_record(twitter_id= None))
+# print(read_record(twitter_id= None))
 
 
 def get_url(twitter_id):
@@ -134,7 +134,7 @@ def get_url(twitter_id):
         # print(urls)
         return urls
     else:
-        res = cursor.execute("SELECT twitter_id,linkedin_url FROM Employee WHERE id = %s",(id_info))
+        res = cursor.execute("SELECT id,twitter_id,linkedin_url FROM Employee WHERE twitter_id = %s",(twitter_id,))
         urls = cursor.fetchall()
         logger.info(f"url for {twitter_id} fetched ")
         # print(urls)
@@ -193,7 +193,7 @@ def update_tweet_sentiment_from_ids():
     logger.info(f"list of updated twitter sentiments - {list}")
     return list
 
-print(update_tweet_sentiment_from_ids())
+# print(update_tweet_sentiment_from_ids())
 
 
 def update_twitter_linkedin_sentiment(twitter_id,linkedin_sentiment = False):
