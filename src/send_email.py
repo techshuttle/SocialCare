@@ -1,9 +1,12 @@
 import config
 
 from smtplib import SMTP
+from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+# from email.message import EmailMessage
 
+# msg = EmailMessage()
 
 def send_mail(body):
 
@@ -15,6 +18,8 @@ def send_mail(body):
 
     body_content = body
     message.attach(MIMEText(body_content, "html"))
+
+
     msg_body = message.as_string()
 
     server = SMTP('smtp.gmail.com', 587)

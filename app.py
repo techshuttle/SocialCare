@@ -64,9 +64,10 @@ def add_sentiment():
     logger.info(f"status of sentiments {list_sentiments}")
     if list_sentiments[0] == 1:
         result = {"status": "success"}
+        logger.info("added sentiment successfully")
     else:
         result = {"status": "failure"}
-    logger.info("Added Sentiments successfully")
+        logger.info("failed to add sentiments")
     return jsonify(result)
 
 
@@ -106,7 +107,8 @@ def get_members():
 
 
 # @app.route("/notify", methods=["GET"])
-@sched.scheduled_job(trigger= 'cron',day = '*')
+# @sched.scheduled_job(trigger= 'cron',minute = '*')
+@app.route("/notify", methods=["GET"])
 def notify():
     sentiment_data = db.read_name_sentiment()
     logger.info(f"mailing sentiment data for {sentiment_data}")

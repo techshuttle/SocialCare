@@ -76,6 +76,6 @@ def tweet_user(username,max_tweets):
 
 api = twitter_api()
 
-if __name__ == '__main__':
-    a = tweet_user("@rajatpaliwal319", 1)
-    print(a)
+# if __name__ == '__main__':
+#     a = tweet_user("@rajatpaliwal319", 1)
+#     print(a)

@@ -2,10 +2,12 @@ import matplotlib.pyplot as plt
 #pie chart
 """df with name, id, sentiment.
 use pie chart."""
-from db_utils import read_name_sentiment
-df = read_name_sentiment()
+from db_utils import read_name_sentiment_add_pattern
+df = read_name_sentiment_add_pattern()
+# print(df)
 df["sentiment_binary"] = df["sentiment"].apply(lambda x: 0 if x < 0 else 1)
-
+# print(df["sentiment_binary"].value_counts())
+print(df['sentiment_pattern'])
 
 
 def pie_chart():
@@ -13,7 +15,7 @@ def pie_chart():
     plt.pie(df["sentiment_binary"].value_counts(), labels = ["Positive","Negative"])
     plt.show()
 
-print(pie_chart())
+# print(pie_chart())
 
 
 
@@ -44,7 +46,7 @@ def show_sentiment_today():
     plt.title('Tweet Sentiments Today')
     plt.show()
 
-
+# show_sentiment_today()
 
 def show_sentiment_today_fancy():
     import matplotlib.pyplot as plt
@@ -75,8 +77,42 @@ def show_sentiment_today_fancy():
         ax.text(x_position, label_y, language, ha="center", va="top")
     # Placing the x-axis label, note the transformation into `Axes` co-ordinates
     # previously data co-ordinates for the x ticklabels
-    ax.text(0.5, -0.05, "Usage", ha="center", va="top", transform=ax.transAxes)
+    ax.text(0.5, -0.05, "Names", ha="center", va="top", transform=ax.transAxes)
 
     plt.show()
 
-# show_sentiment_today_fancy()
+show_sentiment_today_fancy()
+
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+#https://towardsdatascience.com/dealing-with-list-values-in-pandas-dataframes-a177e534f173
+
+employees = df['name'].to_list()
+tweet = ["Latest Tweet",2,3,4,5,6,7,8,9,10,11,12,13,14,"15th"]
+
+
+# def heatmap_2d():
+data = df['sentiment_pattern'].apply(eval).to_list()
+print(data)
+fig,ax = plt.subplots()
+ax.imshow( data, cmap = "autumn", interpolation='nearest')
+ax.set_xticks(np.arange(len(tweet)))
+ax.set_yticks(np.arange(len(employees)))
+
+ax.set_xticklabels(tweet)
+ax.set_yticklabels(employees)
+
+# Rotate the tick labels and set their alignment.
+plt.setp(ax.get_xticklabels(), rotation=60,ha="right",
+         rotation_mode="anchor")
+
+plt.title("Sentiment Pattern of tweets over 15 Days")
+plt.show()
+plt.savefig("Heatmap.jpg")
+#
+
+# References -
+# https://matplotlib.org/stable/gallery/images_contours_and_fields/image_annotated_heatmap.html
+#https://towardsdatascience.com/dealing-with-list-values-in-pandas-dataframes-a177e534f173
