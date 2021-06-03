@@ -1,10 +1,10 @@
 # SocialCare
 
 Social Care is a Python Based plug and play sentiment analysis project.
-
 # Use Case
-Social Care can be used by HRs to analyze sentiments of their employees based on their social media accounts.
-It can also be used to check on Hate Speeches in twitter.
+1. Social Care can be used by HRs to analyze sentiments of their employees based on their social media accounts.
+2. It can also be used to check on Hate Speeches in twitter.
+3. Among Social Groups, it can help check sentiment pattern of a member and check if they need attention.
 
 # Visualizations 
 ![img_2.png](img_2.png)
@@ -13,6 +13,7 @@ It can also be used to check on Hate Speeches in twitter.
 
 # Architectural Diagram
 
+![img_4.png](img_4.png)
 
 # Data Flow Diagram
 
