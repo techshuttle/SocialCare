@@ -1,0 +1,268 @@
+{
+	"info": {
+		"_postman_id": "1f53594b-693f-472e-ac8c-7e08972b7384",
+		"name": "SocialCare",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Add Members",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 14,\r\n    \"name\": \"sachin\",\r\n    \"twitter_id\": \"@tandulkar\",\r\n    \"linkedin_url\": \"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/add_members",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"add_members"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Add Members Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 14,\r\n    \"name\": \"sachin\",\r\n    \"twitter_id\": \"@tandulkar\",\r\n    \"linkedin_url\": \"1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/add_members",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"add_members"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "26"
+						},
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.0.1 Python/3.8.5"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 25 May 2021 14:03:31 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"failure\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Read Members",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": null
+			},
+			"response": []
+		},
+		{
+			"name": "Get URLs",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": null
+			},
+			"response": [
+				{
+					"name": "Get URLs Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/get_urls",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"get_urls"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "530"
+						},
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.0.1 Python/3.8.5"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 25 May 2021 14:16:40 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"result\": {\n        \"result\": [\n            {\n                \"linkedin\": \"@rajatpaliwal319\",\n                \"twitter\": \"false\"\n            },\n            {\n                \"linkedin\": \"@rajatpaliwal319\",\n                \"twitter\": \"false\"\n            },\n            {\n                \"linkedin\": \"@elonmusk\",\n                \"twitter\": \"false\"\n            },\n            {\n                \"linkedin\": \"@elonmusk\",\n                \"twitter\": \"false\"\n            },\n            {\n                \"linkedin\": \"@elonmusk\",\n                \"twitter\": \"false\"\n            },\n            {\n                \"linkedin\": \"@tandulkar\",\n                \"twitter\": \"1234\"\n            }\n        ]\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Notify with Email",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": null
+			},
+			"response": [
+				{
+					"name": "Email Sent Successfully",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/notify",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"notify"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "html",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "text/html; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "23"
+						},
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.0.1 Python/3.8.5"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 25 May 2021 14:21:06 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "Mail sent successfully."
+				}
+			]
+		},
+		{
+			"name": "Add Sentiment",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": null
+			},
+			"response": [
+				{
+					"name": "Add Sentiment Success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/add_sentiment",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"add_sentiment"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "26"
+						},
+						{
+							"key": "Server",
+							"value": "Werkzeug/2.0.1 Python/3.8.5"
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 25 May 2021 14:25:45 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"success\"\n}"
+				}
+			]
+		}
+	]
+}
