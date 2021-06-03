@@ -30,13 +30,30 @@ logger.addHandler(file_handler)
 # dblog = setup_logger("db_logger", "../logs/db_logfile.log")
 
 
+# def conn():
+#     """returns connection and cursor"""
+#     conn = psycopg2.connect(
+#                 database =config.DB_NAME,
+#                 user = config.DB_USER,
+#                 password = config.DB_PASS,
+#                 host = config.DB_HOST
+#     )
+#     conn.autocommit = True
+#     cursor = conn.cursor()
+#     logger.info("postgres connection Successful")
+#     return conn, cursor
+#
+# conn, cursor = conn()
+
+#Heroku database
 def conn():
     """returns connection and cursor"""
     conn = psycopg2.connect(
-                database =config.DB_NAME,
-                user = config.DB_USER,
-                password = config.DB_PASS,
-                host = config.DB_HOST
+                database =config.DB_NAME_h,
+                user = config.DB_USER_h,
+                password = config.DB_PASS_h,
+                host = config.DB_HOST_h,
+                sslmode='require'
     )
     conn.autocommit = True
     cursor = conn.cursor()
@@ -44,24 +61,7 @@ def conn():
     return conn, cursor
 
 conn, cursor = conn()
-
-# #Heroku database
-# def conn():
-#     """returns connection and cursor"""
-#     conn = psycopg2.connect(
-#                 database =config.DB_NAME_h,
-#                 user = config.DB_USER_h,
-#                 password = config.DB_PASS_h,
-#                 host = config.DB_HOST_h,
-#                 sslmode='require'
-#     )
-#     conn.autocommit = True
-#     cursor = conn.cursor()
-#     logger.info("postgres connection Successful")
-#     return conn, cursor
-
-# conn, cursor = conn()
-# print(conn,cursor)
+print(conn,cursor)
 
 
 def create_database(db):
@@ -92,13 +92,15 @@ def insert_data(id,name,twitter_id,linkedin_url = False):
     conn.autocommit = True
     try:
         cursor.execute("INSERT INTO Employee(id,name,twitter_id,linkedin_url) VALUES (%s,%s,%s,%s)",(id,name,twitter_id,linkedin_url))
-    except:
+    except Exception as e:
         return 0
-        # logger.error("Insert Query unsuccessful.Please add new values.")
+        logger.error(f"{e}- needs to be corrected")
     return 1
 
-insert_data(6,"Ramchandra Guha","@Ram_Guha",linkedin_url = False)
-
+# print(insert_data(8,"PMO India","@PMOIndia",linkedin_url = False))
+print(insert_data(8,"PMO India","@PMOIndia",linkedin_url = False))
+print(insert_data(8,"PMO India","@PMOIndia",linkedin_url = False))
+print(insert_data(8,"PMO India","@PMOIndia",linkedin_url = False))
 #Read Table
 
 def read_records():
@@ -107,6 +109,8 @@ def read_records():
     employees = cursor.fetchall()
     logger.info("read table")
     return employees
+
+# print(read_records())
 
 def read_record(twitter_id):
     if twitter_id is None:
@@ -174,7 +178,7 @@ def update_tweet_sentiment_from_ids():
     s = "SELECT twitter_id FROM Employee"
     cursor.execute(s)
     twitter_ids = cursor.fetchall()
-    print(twitter_ids)
+    logger.info(f"{twitter_ids}")
     conn.commit()
     # return twitter_ids
     list = [update_tweet_sentiment(id[0]) for id in twitter_ids]
@@ -210,7 +214,7 @@ def get_twitter_sentiment_pattern_from_ids(twitter_id):
         return print(error)
     return 1
 
-# get_twitter_sentiment_pattern_from_ids("@vijayshekhar")
+# print(get_twitter_sentiment_pattern_from_ids("@vijayshekhar"))
 
 
 #check the function
@@ -290,5 +294,5 @@ def read_name_sentiment_add_pattern():
     df = pd.DataFrame(employee[1:], columns=("id", "name", "sentiment", "sentiment_pattern"))
     return df
 
-print(read_name_sentiment_add_pattern())
+# print(read_name_sentiment_add_pattern())
 

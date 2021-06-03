@@ -13,7 +13,7 @@ Social Care is a Python Based plug and play sentiment analysis project.
 
 # Architectural Diagram
 
-![img_4.png](Images/img_4.png)
+![img.png](Images/img.png)
 
 # Data Flow Diagram
 

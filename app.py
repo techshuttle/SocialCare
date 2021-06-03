@@ -108,9 +108,12 @@ def get_members():
 
 # @app.route("/notify", methods=["GET"])
 # @sched.scheduled_job(trigger= 'cron',minute = '*')
+
+# @sched.scheduled_job(trigger= 'cron',minute = '*')
 @app.route("/notify", methods=["GET"])
 def notify():
-    sentiment_data = db.read_name_sentiment()
+
+    sentiment_data = db.read_name_sentiment_add_pattern()
     logger.info(f"mailing sentiment data for {sentiment_data}")
     try:
         output = build_table(sentiment_data, 'blue_light')
