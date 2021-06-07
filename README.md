@@ -43,3 +43,10 @@ References
 6. Sending Email with python - https://www.youtube.com/watch?v=JRCJ6RtE3xU
 7. Cron-job to automate flow - https://dkhundley.medium.com/data-science-quick-tip-002-running-a-cronjob-from-within-a-flask-api-b77b5d94add5
 8. 2-D Heatmap - # https://matplotlib.org/stable/gallery/images_contours_and_fields/image_annotated_heatmap.html
+9. https://towardsdatascience.com/sentiment-analysis-concept-analysis-and-applications-6c94d6f58c17
+10.Plotly- https://community.plotly.com/t/count-repeated-names-and-add-the-number-to-the-pie-graph/33710/3
+11.Plotly- https://www.youtube.com/watch?v=_b2KXL0wHQg
+12. Plotly Bar Chart - https://www.youtube.com/watch?v=N1GwQNatOwo&list=PLh3I780jNsiTXlWYiNWjq2rBgg3UsL1Ub   
+13.Dashboard - https://stackoverflow.com/questions/63459424/how-to-add-multiple-graphs-to-dash-app-on-a-single-browser-page
+14.Dashboard - https://stackoverflow.com/questions/66277766/plotly-dash-button-callback-function
+15. Detailed blog on Dash - https://towardsdatascience.com/deploying-your-dash-app-to-heroku-the-magical-guide-39bd6a0c586c
