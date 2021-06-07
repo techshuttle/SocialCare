@@ -49,4 +49,5 @@ References
 12. Plotly Bar Chart - https://www.youtube.com/watch?v=N1GwQNatOwo&list=PLh3I780jNsiTXlWYiNWjq2rBgg3UsL1Ub   
 13.Dashboard - https://stackoverflow.com/questions/63459424/how-to-add-multiple-graphs-to-dash-app-on-a-single-browser-page
 14.Dashboard - https://stackoverflow.com/questions/66277766/plotly-dash-button-callback-function
-15. Detailed blog on Dash - https://towardsdatascience.com/deploying-your-dash-app-to-heroku-the-magical-guide-39bd6a0c586c
+15. Detailed blog on Dash - https://towardsdatascience.com/how-to-build-a-complex-reporting-dashboard-using-dash-and-plotl-4f4257c18a7f
+16. Color Scales in Plotly- https://plotly.com/python/builtin-colorscales/
