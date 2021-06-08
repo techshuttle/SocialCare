@@ -1,11 +1,13 @@
+import os
 import tweepy
 import config
 import pandas as pd
 import sys
 import numpy as np
 import re
-from nltk.stem import WordNetLemmatizer
 import time
+from nltk.stem import WordNetLemmatizer
+from datetime import datetime,timedelta
 
 from expertai.nlapi.cloud.client import ExpertAiClient
 client = ExpertAiClient()
@@ -13,7 +15,7 @@ client = ExpertAiClient()
 # from dotenv import load_dotenv
 # load_dotenv()
 
-import os
+
 os.environ["EAI_USERNAME"] = config.expertai_mail
 os.environ["EAI_PASSWORD"] =config.expertai_password
 
@@ -60,6 +62,12 @@ def preprocess(tweet):
     return sent
 
 
+def tweet_pattern_in_last_4months(tweet):
+    """helper function to return only tweets within last 4 months"""
+    if tweet.created_at > datetime.now() - timedelta(days=120):
+        senti = sentiment(preprocess(tweet.full_text))
+    return senti
+
 def tweet_user(username,max_tweets):
     """Extracting user information"""
     # Creation of query method using parameters
@@ -73,9 +81,22 @@ def tweet_user(username,max_tweets):
         sentiment_pattern = [0 if tweet < 0 else 1 for tweet in tweets_list]
         return str(sentiment_pattern)
 
+def tweet_user_updated(username,max_tweets):
+    """returns latest tweets( not older than yesterday) or tweet pattern for no. of tweets given in max_tweets"""
+    tweets = tweepy.Cursor(api.user_timeline, id=username, tweet_mode='extended').items(max_tweets)
+    if max_tweets == 1:
+        # (datetime.datetime.now() - tweet.created_at).days < 1
+        tweet = [[sentiment(preprocess(tweet.full_text)) if tweet.created_at > datetime.now() - timedelta(days= 1) else 0] for tweet in tweets]
+        return float(tweet[0][0])
+    if max_tweets > 1:
+        #returns tweet pattern upto last 4 months
+        tweets_list = [tweet_pattern_in_last_4months(tweet) for tweet in tweets]
+        sentiment_pattern = [-1 if tweet < 0 else 1 for tweet in tweets_list]
+        return str(sentiment_pattern)
 
 api = twitter_api()
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
+    a = tweet_user_updated("@PMOIndia",15)
 #     a = tweet_user("@rajatpaliwal319", 1)
-#     print(a)
+    print(a)
