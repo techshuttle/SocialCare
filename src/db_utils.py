@@ -256,10 +256,32 @@ def read_name_sentiment_add_pattern():
     cursor.execute(s)
     employee = cursor.fetchall()
     # print(employee)
-    # ilog.info(f"The sentiments of the employees are {employee}")
+    logger.info.info(f"The sentiments of the employees are {employee}")
     conn.commit()
 
     df = pd.DataFrame(employee[1:], columns=("id", "name", "sentiment_today", "sentiment_pattern"))
     return df
 
 # print(read_name_sentiment_add_pattern())
+
+
+def get_twitter_sentiment_pattern_of_employee(twitter_id,max_tweets):
+    """function to get employee detail with "n" no. of tweets"""
+    twitter_sentiment_pattern = tweet_user_updated(twitter_id,max_tweets)
+    logger.info(f"{twitter_sentiment_pattern}")
+    try:
+
+        add = cursor.execute("""UPDATE Employee SET twitter_sentiment_pattern = %s WHERE twitter_id = %s""",(twitter_sentiment_pattern,twitter_id,))
+        logger.info(f"twitter sentiment pattern for {twitter_id} updated successfully")
+        cursor.execute("SELECT id,name,tweet_sentiment,twitter_sentiment_pattern from Employee WHERE twitter_id = %s",(twitter_id,))
+        logger.info(f"employee info from {twitter_id} not fetched.")
+        employee = cursor.fetchall()
+        conn.commit()
+        return employee
+    except Exception as e:
+        return e
+
+# print(get_twitter_sentiment_pattern_of_employee("@PMOIndia",max_tweets = 20))
+
+
+

@@ -94,25 +94,25 @@ tweet = ["Latest Tweet",2,3,4,5,6,7,8,9,10,11,12,13,14,"15th"]
 
 
 # def heatmap_2d():
-data = df['sentiment_pattern'].apply(eval).to_list()
-print(data)
-fig,ax = plt.subplots()
-ax.imshow( data, cmap = "autumn", interpolation='nearest')
-ax.set_xticks(np.arange(len(tweet)))
-ax.set_yticks(np.arange(len(employees)))
-
-ax.set_xticklabels(tweet)
-ax.set_yticklabels(employees)
-
-# Rotate the tick labels and set their alignment.
-plt.setp(ax.get_xticklabels(), rotation=60,ha="right",
-         rotation_mode="anchor")
-
-plt.title("Sentiment Pattern of tweets over 15 Days")
-plt.show()
-plt.savefig("Heatmap.jpg")
+# data = df['sentiment_pattern'].apply(eval).to_list()
+# print(type(data))
+# fig,ax = plt.subplots()
+# ax.imshow( data, cmap = "autumn", interpolation='nearest')
+# ax.set_xticks(np.arange(len(tweet)))
+# ax.set_yticks(np.arange(len(employees)))
+# #
+# ax.set_xticklabels(tweet)
+# ax.set_yticklabels(employees)
 #
-
-# References -
-# https://matplotlib.org/stable/gallery/images_contours_and_fields/image_annotated_heatmap.html
-#https://towardsdatascience.com/dealing-with-list-values-in-pandas-dataframes-a177e534f173
+# # Rotate the tick labels and set their alignment.
+# plt.setp(ax.get_xticklabels(), rotation=60,ha="right",
+#          rotation_mode="anchor")
+#
+# plt.title("Sentiment Pattern of tweets over 15 Days")
+# plt.show()
+# plt.savefig("Heatmap.jpg")
+# #
+#
+# # References -
+# # https://matplotlib.org/stable/gallery/images_contours_and_fields/image_annotated_heatmap.html
+# #https://towardsdatascience.com/dealing-with-list-values-in-pandas-dataframes-a177e534f173

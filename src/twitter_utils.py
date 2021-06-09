@@ -58,14 +58,13 @@ def preprocess(tweet):
     # Lemmatize
     lemmatizer = WordNetLemmatizer()
     sent = ' '.join([lemmatizer.lemmatize(w) for w in tweet.split() if len(lemmatizer.lemmatize(w)) > 3])
-
     return sent
 
 
 def tweet_pattern_in_last_4months(tweet):
     """helper function to return only tweets within last 4 months"""
     if tweet.created_at > datetime.now() - timedelta(days=120):
-        senti = sentiment(preprocess(tweet.full_text))
+        senti = sentiment(sentiment(tweet.full_text))
     return senti
 
 def tweet_user(username,max_tweets):
@@ -85,7 +84,6 @@ def tweet_user_updated(username,max_tweets):
     """returns latest tweets( not older than yesterday) or tweet pattern for no. of tweets given in max_tweets"""
     tweets = tweepy.Cursor(api.user_timeline, id=username, tweet_mode='extended').items(max_tweets)
     if max_tweets == 1:
-        # (datetime.datetime.now() - tweet.created_at).days < 1
         tweet = [[sentiment(preprocess(tweet.full_text)) if tweet.created_at > datetime.now() - timedelta(days= 1) else 0] for tweet in tweets]
         return float(tweet[0][0])
     if max_tweets > 1:
@@ -94,9 +92,13 @@ def tweet_user_updated(username,max_tweets):
         sentiment_pattern = [-1 if tweet < 0 else 1 for tweet in tweets_list]
         return str(sentiment_pattern)
 
+
+
+# functions added on June 9,2021
+
 api = twitter_api()
 
 if __name__ == '__main__':
-    a = tweet_user_updated("@PMOIndia",15)
+    a = tweet_user_updated("@PMOIndia",50)
 #     a = tweet_user("@rajatpaliwal319", 1)
     print(a)

@@ -14,24 +14,20 @@ from src.send_email import send_mail
 from pretty_html_table import build_table
 from apscheduler.schedulers.background import BackgroundScheduler
 
+#Scheduler
 sched = BackgroundScheduler(daemon =True)
 sched.start()
 
+#Logger
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter("%(lineno)d: %(levelname)s :%(asctime)s:%(name)s:%(message)s")
-
 file_handler = logging.FileHandler("app.log")
 file_handler.setFormatter(formatter)
-
 stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(formatter)
-
 logger.addHandler(file_handler)
 logger.addHandler(stream_handler)
-
-# from src.logger import setup_logger
-# alog = setup_logger("app_logger", "./logs/app_logfile.log")
 
 
 app = Flask(__name__)
@@ -51,10 +47,7 @@ def get_urls():
     list_urls = db.get_url(twitter_id=twitter_id)
     for id, twitter, linkedin in list_urls:
         result["result"].append({"id": id, "linkedin": linkedin, "twitter": twitter})
-    logger.info(f"{data} is our data for get_urls")
-    # result = {"result": []}
-
-    logger.info("urls read successfully")
+    logger.info(f"{result} is updated for get_urls")
     return jsonify(result=result)
 
 
@@ -103,16 +96,13 @@ def get_members():
     except Exception as e:
         logger.error(f"{e}")
     return json.dumps(list_members,use_decimal= True)
-    # return jsonify(list_members)
+
 
 
 # @app.route("/notify", methods=["GET"])
 # @sched.scheduled_job(trigger= 'cron',minute = '*')
-
-# @sched.scheduled_job(trigger= 'cron',minute = '*')
-@app.route("/notify", methods=["GET"])
 def notify():
-
+    """Triggers mail with insights asked from read_name_sentiment_add_pattern"""
     sentiment_data = db.read_name_sentiment_add_pattern()
     logger.info(f"mailing sentiment data for {sentiment_data}")
     try:
@@ -123,6 +113,18 @@ def notify():
         logger.error(f"{error}")
 
     return "Mail sent successfully."
+
+
+@app.route("/get_user_sentiment", methods = ["GET"])
+def get_user_sentiment():
+    data = request.get_json()
+    result = {"result": []}
+    twitter_id = data["twitter_id"]
+    employee_info = db.get_twitter_sentiment_pattern_of_employee(twitter_id,max_tweets = 15)
+    for id, name, sentiment,sentiment_pattern in employee_info:
+        result["result"].append({"id": id, "name": name, "sentiment": sentiment, "sentiment_pattern":sentiment_pattern})
+    logger.info(f"{result} is updated for get_user_sentiment")
+    return jsonify(result=result)
 
 if __name__ == "__main__":
     logging.info('App started and is running successfully')
