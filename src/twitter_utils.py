@@ -4,21 +4,12 @@ import config
 import pandas as pd
 import sys
 import numpy as np
-import re
+# import re
 import time
-from nltk.stem import WordNetLemmatizer
+
 from datetime import datetime,timedelta
-
-from expertai.nlapi.cloud.client import ExpertAiClient
-client = ExpertAiClient()
-
-# from dotenv import load_dotenv
-# load_dotenv()
-
-
-os.environ["EAI_USERNAME"] = config.expertai_mail
-os.environ["EAI_PASSWORD"] =config.expertai_password
-
+from expertai_utils import sentiment, key_phrase_extraction, named_entity_extraction
+from text_preprocess import preprocess
 
 
 """authentication function"""
@@ -38,60 +29,41 @@ def twitter_api():
     api = tweepy.API(auth,wait_on_rate_limit= True)
     return api
 
-def sentiment(text):
-    """returns overall sentiment"""
-    output = client.specific_resource_analysis(body = {"document":{"text": text}},
-                                               params = {'language': 'en','resource': 'sentiment'})
-    return output.sentiment.overall
+# def tweet_pattern_in_last_4months(tweet):
+#     """helper function to return only tweets within last 4 months"""
+#     if tweet.created_at > datetime.now() - timedelta(days=120):
+#         senti = sentiment(preprocess(tweet.full_text))
+#     return senti
 
-# Cleaning the tweets
-def preprocess(tweet):
-    # remove links
-    tweet = re.sub(r'http\S+', '', tweet)
-    # remove mentions
-    tweet = re.sub("@\w+", "", tweet)
-    # alphanumeric and hashtags
-    tweet = re.sub("[^a-zA-Z#]", " ", tweet)
-    # remove multiple spaces
-    tweet = re.sub("\s+", " ", tweet)
-    tweet = tweet.lower()
-    # Lemmatize
-    lemmatizer = WordNetLemmatizer()
-    sent = ' '.join([lemmatizer.lemmatize(w) for w in tweet.split() if len(lemmatizer.lemmatize(w)) > 3])
-    return sent
-
-
-def tweet_pattern_in_last_4months(tweet):
-    """helper function to return only tweets within last 4 months"""
-    if tweet.created_at > datetime.now() - timedelta(days=120):
-        senti = sentiment(sentiment(tweet.full_text))
-    return senti
-
-def tweet_user(username,max_tweets):
-    """Extracting user information"""
-    # Creation of query method using parameters
-    tweets = tweepy.Cursor(api.user_timeline,id=username,tweet_mode = 'extended').items(max_tweets)
-
-    tweets_list = [sentiment(preprocess(tweet.full_text)) for tweet in tweets]
-    if max_tweets == 1:
-        for tweet in tweets_list:
-            return float(tweet)
-    if max_tweets > 1:
-        sentiment_pattern = [0 if tweet < 0 else 1 for tweet in tweets_list]
-        return str(sentiment_pattern)
 
 def tweet_user_updated(username,max_tweets):
     """returns latest tweets( not older than yesterday) or tweet pattern for no. of tweets given in max_tweets"""
     tweets = tweepy.Cursor(api.user_timeline, id=username, tweet_mode='extended').items(max_tweets)
     if max_tweets == 1:
-        tweet = [[sentiment(preprocess(tweet.full_text)) if tweet.created_at > datetime.now() - timedelta(days= 1) else 0] for tweet in tweets]
+        tweet = [[sentiment(preprocess(tweet.full_text)) if tweet.created_at > datetime.now() - timedelta(days= 7) else 0] for tweet in tweets]
         return float(tweet[0][0])
     if max_tweets > 1:
         #returns tweet pattern upto last 4 months
-        tweets_list = [tweet_pattern_in_last_4months(tweet) for tweet in tweets]
+        tweets_list = [sentiment(preprocess(tweet.full_text)) for tweet in tweets]
         sentiment_pattern = [-1 if tweet < 0 else 1 for tweet in tweets_list]
         return str(sentiment_pattern)
 
+def tweet_user_key_phrase(username,max_tweets):
+    tweets = tweepy.Cursor(api.user_timeline, id=username, tweet_mode='extended').items(max_tweets)
+    if max_tweets == 1:
+        tweet = [
+            [key_phrase_extraction(preprocess(tweet.full_text)) if tweet.created_at > datetime.now() - timedelta(days=7) else 0] for
+            tweet in tweets]
+    return tweet[0][0]
+
+def tweet_user_NER(username,max_tweets):
+    tweets = tweepy.Cursor(api.user_timeline, id=username, tweet_mode='extended').items(max_tweets)
+    if max_tweets == 1:
+        tweet = [
+            [named_entity_extraction(preprocess(tweet.full_text)) if tweet.created_at > datetime.now() - timedelta(
+                days=7) else 0] for
+            tweet in tweets]
+    return tweet[0][0]
 
 
 # functions added on June 9,2021
@@ -99,6 +71,9 @@ def tweet_user_updated(username,max_tweets):
 api = twitter_api()
 
 if __name__ == '__main__':
-    a = tweet_user_updated("@PMOIndia",50)
+    name = "@ArianaGrande"
+    a = tweet_user_updated(name ,10)
+    b = tweet_user_key_phrase(name,1)
+    c = tweet_user_NER(name,1)
 #     a = tweet_user("@rajatpaliwal319", 1)
-    print(a)
+#     print(c)

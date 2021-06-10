@@ -97,6 +97,18 @@ def get_members():
         logger.error(f"{e}")
     return json.dumps(list_members,use_decimal= True)
 
+@app.route("/remove_member", methods = ["GET"])
+def remove_member():
+    data = request.get_json()
+    twitter_id = data["twitter_id"]
+    try:
+        remove_employee = db.delete_records(twitter_id)
+        logger.info(f"member with twitter id {twitter_id} removed")
+    except Exception as e:
+        logger.error(f"{e}")
+    return jsonify({"status":"success"})
+
+
 
 
 # @app.route("/notify", methods=["GET"])
@@ -115,8 +127,8 @@ def notify():
     return "Mail sent successfully."
 
 
-@app.route("/get_user_sentiment", methods = ["GET"])
-def get_user_sentiment():
+@app.route("/get_member_sentiment", methods = ["GET"])
+def get_member_sentiment():
     data = request.get_json()
     result = {"result": []}
     twitter_id = data["twitter_id"]

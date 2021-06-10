@@ -136,7 +136,7 @@ def get_url(twitter_id):
 def update_tweet_sentiment(twitter_id):
     tweet_sentiment = (tweet_user_updated(twitter_id,1))
     # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
-    # print(tweet_sentiment)
+    print(tweet_sentiment)
     try:
         sentiment = cursor.execute("""UPDATE Employee SET tweet_sentiment = %s WHERE twitter_id = %s """,(tweet_sentiment, twitter_id ))
         logger.info(f"twitter sentiment for {twitter_id} updated successfully")
@@ -145,7 +145,10 @@ def update_tweet_sentiment(twitter_id):
         return print(error)
     return 1
 
+# print(update_tweet_sentiment('@realDonaldTrump'))
 
+
+# import time
 def update_tweet_sentiment_from_ids():
     """updating and checking the update of twitter sentiment for the user"""
     s = "SELECT twitter_id FROM Employee"
@@ -153,10 +156,14 @@ def update_tweet_sentiment_from_ids():
     twitter_ids = cursor.fetchall()
     logger.info(f"{twitter_ids}")
     conn.commit()
-    # return twitter_idsread_name_sentiment_add_pattern()
-    list = [update_tweet_sentiment(id[0]) for id in twitter_ids]
-    logger.info(f"list of updated twitter sentiments - {list}")
-    return list
+    try:
+        list = [update_tweet_sentiment(id[0]) for id in twitter_ids]
+        print(list)
+        logger.info(f"list of updated twitter sentiments - {list}")
+        return list
+    except Exception as e:
+        print(e)
+        return 0
 
 # print(update_tweet_sentiment_from_ids())
 
@@ -188,26 +195,27 @@ def get_twitter_sentiment_pattern_from_ids(twitter_id):
         return 0
     return 1
 
+# print(get_twitter_sentiment_pattern_from_ids("@ricky_martin"))
 
 #check the function
 def update_twitter_sentiment_pattern_from_ids():
     """updating and checking the update of twitter sentiment for the user"""
     s = "SELECT twitter_id FROM Employee"
     cursor.execute(s)
-    twitter_ids = cursor.fetchall()
-
+    twitter_ids = cursor.fetchmany(30)
     # print(twitter_ids)
     conn.commit()
     try:
         list = []
-        for id[0] in twitter_ids:
+        for id in twitter_ids:
             list.append(get_twitter_sentiment_pattern_from_ids(id[0]))
         logger.info("list of sentiment pattern updates appended.")
+        return list
 
     except Exception as e:
-        0
-    return 1
+        return e
 
+print(update_twitter_sentiment_pattern_from_ids())
 
 #Delete
 
@@ -221,6 +229,8 @@ def delete_records(twitter_id):
         logger.warning(f"could not delete {twitter_id} from Employee.")
         return 0
     return 1
+
+# print(delete_records("@aamir_khan"))
 
 
 #Other useful functions
@@ -256,7 +266,7 @@ def read_name_sentiment_add_pattern():
     cursor.execute(s)
     employee = cursor.fetchall()
     # print(employee)
-    logger.info.info(f"The sentiments of the employees are {employee}")
+    logger.info(f"The sentiments of the employees are {employee}")
     conn.commit()
 
     df = pd.DataFrame(employee[1:], columns=("id", "name", "sentiment_today", "sentiment_pattern"))
@@ -282,6 +292,35 @@ def get_twitter_sentiment_pattern_of_employee(twitter_id,max_tweets):
         return e
 
 # print(get_twitter_sentiment_pattern_of_employee("@PMOIndia",max_tweets = 20))
+
+import psycopg2.extras as psql_extras
+
+def insert_data_from_df(
+    query: str,
+    conn: psycopg2.extensions.connection,
+    cur: psycopg2.extensions.cursor,
+    df: pd.DataFrame,
+    page_size: int
+) -> None:
+    data_tuples = [tuple(row.to_numpy()) for index, row in df.iterrows()]
+    try:
+        psql_extras.execute_values(
+            cur, query, data_tuples, page_size=page_size)
+        print("Query:", cur.query)
+
+    except Exception as error:
+        print(f"{type(error).__name__}: {error}")
+        print("Query:", cur.query)
+        conn.rollback()
+        cur.close()
+
+    else:
+        conn.commit()
+
+# data = pd.read_csv("top_100_twitter.csv")
+# member_query = "INSERT INTO Employee(id, name,twitter_id) VALUES %s"
+# insert_data_from_df(member_query,conn, cursor,data,100)
+#
 
 
 
