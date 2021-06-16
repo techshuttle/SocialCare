@@ -3,16 +3,20 @@ import logging.config
 import os
 import smtplib
 import psycopg2
-import psycopg2.extras
+# import psycopg2.extras
 import config
 import simplejson as json
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify,render_template, redirect
+from flask.helpers import url_for
+from flask_bootstrap import Bootstrap
 from src import twitter_utils
 from src import db_utils as db
 from src.send_email import send_mail
 from pretty_html_table import build_table
 from apscheduler.schedulers.background import BackgroundScheduler
+
+from src.dashboard import create_dash_application
 
 #Scheduler
 sched = BackgroundScheduler(daemon =True)
@@ -32,11 +36,14 @@ logger.addHandler(stream_handler)
 
 app = Flask(__name__)
 
+# Bootstrap(app)
+
+create_dash_application(app)
 
 @app.route("/", methods=['GET'])
 def get_homepage():
     logger.info("homepage successful")
-    return jsonify({"Result": "Success"})
+    return render_template("webpage_garage.html")
 
 
 @app.route("/get_urls", methods=['GET'])
@@ -111,7 +118,7 @@ def remove_member():
 
 
 
-# @app.route("/notify", methods=["GET"])
+@app.route("/notify", methods=["GET"])
 # @sched.scheduled_job(trigger= 'cron',minute = '*')
 def notify():
     """Triggers mail with insights asked from read_name_sentiment_add_pattern"""

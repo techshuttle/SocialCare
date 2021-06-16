@@ -5,7 +5,7 @@ from typing import Dict, List
 import pandas as pd
 import psycopg2.extras
 # from configparser import ConfigParser
-from src.twitter_utils import tweet_user_updated
+from src.twitter_utils import tweet_user_updated,user_tweet_today,tweet_user_NER,tweet_user_key_phrase
 import logging
 
 logger = logging.getLogger(__name__)
@@ -73,32 +73,35 @@ def create_table():
 
 #Insert Records
 
-def insert_data(id,name,twitter_id,linkedin_url = False):
+def insert_data(id,name,twitter_id):
 
     twitter_sentiment = tweet_user_updated(twitter_id,max_tweets= 1)
 
-    linkedin_url = False
+
     conn.autocommit = True
     try:
-        cursor.execute("INSERT INTO Employee(id,name,twitter_id,linkedin_url) VALUES (%s,%s,%s,%s)",(id,name,twitter_id,linkedin_url))
+        cursor.execute("INSERT INTO Employee(id,name,twitter_id) VALUES (%s,%s,%s)",(id,name,twitter_id))
     except Exception as e:
         return 0
         logger.error(f"{e}- needs to be corrected")
     return 1
 
 
-
 #Read Table
 
 def read_records():
+    """for reading all records"""
     sql = "SELECT * FROM Employee;"
     cursor.execute(sql)
     employees = cursor.fetchall()
     logger.info("read table")
     return employees
 
+# print(read_records())
+
 
 def read_record(twitter_id):
+    """for reading a particular record"""
     if twitter_id is None:
         res = cursor.execute("SELECT * FROM Employee")
         urls = cursor.fetchall()
@@ -116,22 +119,51 @@ def read_record(twitter_id):
 def get_url(twitter_id):
     """reading the social media ids from the table"""
     if twitter_id is None:
-        res = cursor.execute("SELECT id, twitter_id,linkedin_url FROM Employee ")
+        res = cursor.execute("SELECT id, twitter_id FROM Employee ")
         urls = cursor.fetchall()
         logger.info("all urls fetched")
         # print(urls)
         return urls
     else:
-        res = cursor.execute("SELECT id,twitter_id,linkedin_url FROM Employee WHERE twitter_id = %s",(twitter_id,))
+        res = cursor.execute("SELECT id,twitter_id FROM Employee WHERE twitter_id = %s",(twitter_id,))
         urls = cursor.fetchall()
         logger.info(f"url for {twitter_id} fetched ")
         # print(urls)
         return urls
 
-
 #Update
 
 #function useful for API
+
+def update_tweet(twitter_id):
+    tweet = user_tweet_today(twitter_id)
+    print(tweet)
+    try:
+        tweet = cursor.execute("""UPDATE Employee SET tweet = %s WHERE twitter_id = %s """,(tweet, twitter_id ))
+        logger.info(f"tweet for {twitter_id} updated successfully")
+    except Exception as error:
+        logger.error(f"{error}")
+        return print(error)
+    return 1
+
+def update_tweet_from_ids():
+    """updating and checking the update of twitter sentiment for the user"""
+    s = "SELECT twitter_id FROM Employee"
+    cursor.execute(s)
+    twitter_ids = cursor.fetchall()
+    logger.info(f"{twitter_ids}")
+    conn.commit()
+    try:
+        list = [update_tweet(id[0]) for id in twitter_ids]
+        print(list)
+        logger.info(f"list of updated twitter sentiments - {list}")
+        return list
+    except Exception as e:
+        print(e)
+        return 0
+
+# print(update_tweet_from_ids())
+
 
 def update_tweet_sentiment(twitter_id):
     tweet_sentiment = (tweet_user_updated(twitter_id,1))
@@ -168,26 +200,11 @@ def update_tweet_sentiment_from_ids():
 # print(update_tweet_sentiment_from_ids())
 
 
-def update_twitter_linkedin_sentiment(twitter_id,linkedin_sentiment = False):
-    tweet_sentiment = tweet_user_updated(twitter_id,1)
-    linkedin_sentiment = False
-    logger.info(f"{tweet_sentiment} to be updated")
-    try:
-        cursor.execute("INSERT INTO Employee (tweet_sentiment,linkedin_sentiment) VALUES (%f, %s)",(tweet_sentiment,linkedin_sentiment))
-        conn.commit()
-        tweet_sentiment = tweet_user_updated(twitter_id)
-        logger.info(f"twitter sentiment for id = {twitter_id} ie {tweet_sentiment} updated.")
-    except Exception as error:
-        logger.error(f"{error}")
-        return 0
-    return 1
-
 
 def get_twitter_sentiment_pattern_from_ids(twitter_id):
     twitter_sentiment_pattern = tweet_user_updated(twitter_id,max_tweets= 15)
     logger.info(f"{twitter_sentiment_pattern}")
     try:
-
         add = cursor.execute("""UPDATE Employee SET twitter_sentiment_pattern = %s WHERE twitter_id = %s""",(twitter_sentiment_pattern,twitter_id,))
         logger.info(f"twitter sentiment pattern for {twitter_id} updated successfully")
     except Exception as error:
@@ -215,7 +232,7 @@ def update_twitter_sentiment_pattern_from_ids():
     except Exception as e:
         return e
 
-print(update_twitter_sentiment_pattern_from_ids())
+# print(update_twitter_sentiment_pattern_from_ids())
 
 #Delete
 
@@ -251,11 +268,12 @@ def query_db(query,args=(), one=False):
 
 def alter_table():
     """ to add new column or delete a column to and from the table"""
-    cursor.execute("""ALTER TABLE Employee ADD COLUMN twitter_sentiment_pattern VARCHAR(250); """)
-    # cursor.execute("ALTER TABLE Employee DROP twitter_sentiment ;")
+    cursor.execute("""ALTER TABLE Employee ADD COLUMN Key_phrase VARCHAR(250); """)
+    # cursor.execute("ALTER TABLE Tweet DROP email;")
     logger.info("Alter table successful")
+    return 1
 
-# alter_table()
+# print(alter_table())
 
 #read name and sentiment to DataFrame
 
@@ -266,13 +284,27 @@ def read_name_sentiment_add_pattern():
     cursor.execute(s)
     employee = cursor.fetchall()
     # print(employee)
-    logger.info(f"The sentiments of the employees are {employee}")
+    logger.info(f"The sentiments of the employees are added")
     conn.commit()
 
     df = pd.DataFrame(employee[1:], columns=("id", "name", "sentiment_today", "sentiment_pattern"))
     return df
 
 # print(read_name_sentiment_add_pattern())
+
+def read_name_tweet_ner_key_phrase():
+    s = """SELECT id,name,tweet,ner,key_phrase from Employee;"""
+    cursor.execute(s)
+    employee = cursor.fetchall()
+    # print(employee)
+    logger.info(f"The {read_name_tweet_ner_key_phrase} is running")
+    conn.commit()
+
+    df = pd.DataFrame(employee[1:], columns=("id", "name", "tweet", "ner","key_phrase"))
+    return df
+
+# print(read_name_tweet_ner_key_phrase().head())
+
 
 
 def get_twitter_sentiment_pattern_of_employee(twitter_id,max_tweets):
@@ -322,5 +354,66 @@ def insert_data_from_df(
 # insert_data_from_df(member_query,conn, cursor,data,100)
 #
 
+# For NER
+# tweet_user_NER
+def update_tweet_NER(twitter_id):
+    tweet_NER = (tweet_user_NER(twitter_id,1))
+    # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
+    print(tweet_NER)
+    try:
+        sentiment = cursor.execute("""UPDATE Employee SET ner = %s WHERE twitter_id = %s """,(tweet_NER, twitter_id ))
+        logger.info(f"twitter NER for {twitter_id} updated successfully")
+    except Exception as error:
+        logger.error(f"{error}")
+        return print(error)
+    return 1
 
 
+def update_tweet_ner_from_ids():
+    """updating and checking the update of twitter sentiment for the user"""
+    s = "SELECT twitter_id FROM Employee"
+    cursor.execute(s)
+    twitter_ids = cursor.fetchall()
+    logger.info(f"{twitter_ids}")
+    conn.commit()
+    try:
+        list = [update_tweet_NER(id[0]) for id in twitter_ids]
+        print(list)
+        logger.info(f"list of updated twitter sentiments - {list}")
+        return list
+    except Exception as e:
+        print(e)
+        return 0
+
+# print(update_tweet_ner_from_ids())
+
+def update_tweet_key_phrase(twitter_id):
+    tweet_key_phrase = (tweet_user_key_phrase(twitter_id,1))
+    # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
+    print(tweet_key_phrase)
+    try:
+        sentiment = cursor.execute("""UPDATE Employee SET key_phrase = %s WHERE twitter_id = %s """,(tweet_key_phrase, twitter_id,))
+        logger.info(f"twitter key phrase for {twitter_id} updated successfully")
+    except Exception as error:
+        logger.error(f"{error}")
+        return print(error)
+    return 1
+
+
+def update_tweet_key_phrase_from_ids():
+    """updating and checking the update of twitter sentiment for the user"""
+    s = "SELECT twitter_id FROM Employee"
+    cursor.execute(s)
+    twitter_ids = cursor.fetchall()
+    logger.info(f"{twitter_ids}")
+    conn.commit()
+    try:
+        list = [update_tweet_key_phrase(id[0]) for id in twitter_ids]
+        print(list)
+        logger.info(f"list of updated twitter key phrases - {list}")
+        return list
+    except Exception as e:
+        print(e)
+        return 0
+
+# print(update_tweet_key_phrase_from_ids())
