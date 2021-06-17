@@ -12,12 +12,14 @@ from datetime import datetime,timedelta
 
 
 from src.expertai_utils import sentiment, key_phrase_extraction, named_entity_extraction
+from src.expertai_utils import resource_concept_score_analysis as rcsa
 from src.text_preprocess import preprocess
 
 
 """authentication function"""
 
 def twitter_api():
+    """to utilize twitter api using the key and token from twitter developer account"""
     try:
         consumer_key = config.consumer_key
         consumer_secret = config.consumer_secret
@@ -53,8 +55,8 @@ def tweet_user_max_tweets(username,max_tweets):
 def user_tweet_today(username):
     """to extract the latest tweet from a user timeline"""
     tweets = tweepy.Cursor(api.user_timeline, id=username, tweet_mode='extended').items(1)
-    tweet = [preprocess(tweet.full_text) for tweet in tweets]
-    return tweet[0]
+    tweet = [[preprocess(tweet.full_text) if tweet.created_at > datetime.now()- timedelta(days=7) else 0] for tweet in tweets]
+    return tweet[0][0]
 
 
 def tweet_user_updated(username,max_tweets):
@@ -64,7 +66,7 @@ def tweet_user_updated(username,max_tweets):
     if max_tweets == 1:
         tweet = [[sentiment(preprocess(tweet.full_text)) if tweet.created_at > datetime.now() - timedelta(days= 7) else 0] for tweet in tweets]
         end = time.time()
-        print("for 1 tweet", end - start)
+        # print("for 1 tweet", end - start)
         return float(tweet[0][0])
     if max_tweets > 1:
         #returns tweet pattern upto last 4 months
@@ -73,6 +75,11 @@ def tweet_user_updated(username,max_tweets):
         end = time.time()
         print(f"for {max_tweets} tweets: ",end - start)
         return str(sentiment_pattern)
+
+def tweet_user_sentiment_type(username):
+    """tweet sentiment type. useful for wordclouds"""
+    sentiment = tweet_user_updated(username,1)
+    return -1 if sentiment < 0 else 1
 
 def tweet_user_key_phrase(username,max_tweets):
     tweets = tweepy.Cursor(api.user_timeline, id=username, tweet_mode='extended').items(max_tweets)
@@ -91,6 +98,17 @@ def tweet_user_NER(username,max_tweets):
             tweet in tweets]
     return tweet[0][0][0]
 
+def tweet_user_RCSA(username,max_tweets):
+    """Resource Concept Score Analysis """
+    tweets = tweepy.Cursor(api.user_timeline, id=username, tweet_mode='extended').items(max_tweets)
+    if max_tweets == 1:
+        tweet = [
+            [rcsa(preprocess(tweet.full_text)) if tweet.created_at > datetime.now() - timedelta(
+                days=7) else 0] for
+            tweet in tweets]
+    return tweet
+
+
 
 # functions added on June 9,2021
 
@@ -98,13 +116,15 @@ api = twitter_api()
 
 if __name__ == '__main__':
     name = "@ArianaGrande"
-    # d = tweet_user_max_tweets(name,1)
-    # a = tweet_user_updated(name ,10)
-    # b = tweet_user_key_phrase(name,1)
-    # c = tweet_user_NER(name,1)
-# #     a = tweet_user("@rajatpaliwal319", 1)
-    t = user_tweet_today(name)
-    # print(t)
-    # do your work here
-    # end_time = datetime.now()
-    # print('Duration: {}'.format(end_time - start_time))
+#     # d = tweet_user_max_tweets(name,1)
+#     # a = tweet_user_updated(name ,10)
+#     # b = tweet_user_key_phrase(name,1)
+#     # c = tweet_user_NER(name,1)
+#     e = tweet_user_RCSA(name,1)
+#     f = tweet_user_sentiment_type(name)
+# # #     a = tweet_user("@rajatpaliwal319", 1)
+#     t = user_tweet_today(name)
+#     print(f)
+#     # do your work here
+#     # end_time = datetime.now()
+#     # print('Duration: {}'.format(end_time - start_time))
