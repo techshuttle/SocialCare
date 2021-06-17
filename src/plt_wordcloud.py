@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from src.db_utils import read_name_tweet_ner_key_phrase
 from wordcloud import WordCloud, STOPWORDS
-from nltk.tokenize import word_tokenize,TweetTokenizer
+
 
 from src.text_preprocess import preprocess
 df = read_name_tweet_ner_key_phrase()
