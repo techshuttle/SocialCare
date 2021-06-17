@@ -32,14 +32,16 @@ word_cloud
 
 
 #for pie chart
-df["sentiment_binary"] = df["sentiment_today"].apply(lambda x: "negative" if x < 0 else "positive")
-day_sentiment_counts = df['sentiment_binary'].value_counts()
+try:
+    df["sentiment_binary"] = df["sentiment_today"].apply(lambda x: "negative" if x < 0 else "positive")
+    day_sentiment_counts = df['sentiment_binary'].value_counts()
 
-# # pie chart
-fig_pie = px.pie(names = day_sentiment_counts.index,values = day_sentiment_counts.values,color = day_sentiment_counts.index, hole = 0.5)
-fig_pie.update_traces(textinfo="label + percent",insidetextfont =dict(color = "white") )
-fig_pie.update_layout(legend= {"itemclick":False})
-
+    # # pie chart
+    fig_pie = px.pie(names = day_sentiment_counts.index,values = day_sentiment_counts.values,color = day_sentiment_counts.index, hole = 0.5)
+    fig_pie.update_traces(textinfo="label + percent",insidetextfont =dict(color = "white") )
+    fig_pie.update_layout(legend= {"itemclick":False})
+except Exception as e:
+    print("please add data")
 #bar graph
 fig_bar = px.bar(
     data_frame= df,
