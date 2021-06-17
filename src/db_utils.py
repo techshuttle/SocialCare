@@ -19,30 +19,13 @@ logger.addHandler(file_handler)
 
 #For localHost
 
-def conn():
-    """returns connection and cursor"""
-    conn = psycopg2.connect(
-                database =config.DB_NAME,
-                user = config.DB_USER,
-                password = config.DB_PASS,
-                host = config.DB_HOST
-    )
-    conn.autocommit = True
-    cursor = conn.cursor()
-    logger.info("postgres connection Successful")
-    return conn, cursor
-
-conn, cursor = conn()
-
-#Heroku database
 # def conn():
 #     """returns connection and cursor"""
 #     conn = psycopg2.connect(
-#                 database =config.DB_NAME_h,
-#                 user = config.DB_USER_h,
-#                 password = config.DB_PASS_h,
-#                 host = config.DB_HOST_h,
-#                 sslmode='require'
+#                 database =config.DB_NAME,
+#                 user = config.DB_USER,
+#                 password = config.DB_PASS,
+#                 host = config.DB_HOST
 #     )
 #     conn.autocommit = True
 #     cursor = conn.cursor()
@@ -50,7 +33,24 @@ conn, cursor = conn()
 #     return conn, cursor
 #
 # conn, cursor = conn()
-# # print(conn,cursor)
+
+#Heroku database
+def conn():
+    """returns connection and cursor"""
+    conn = psycopg2.connect(
+                database =config.DB_NAME_h,
+                user = config.DB_USER_h,
+                password = config.DB_PASS_h,
+                host = config.DB_HOST_h,
+                sslmode='require'
+    )
+    conn.autocommit = True
+    cursor = conn.cursor()
+    logger.info("postgres connection Successful")
+    return conn, cursor
+
+conn, cursor = conn()
+# print(conn,cursor)
 
 
 def create_database(db):
