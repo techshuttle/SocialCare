@@ -294,6 +294,7 @@ def read_name_sentiment_add_pattern():
     conn.commit()
 
     df = pd.DataFrame(employee[1:], columns=("id", "name", "sentiment_today", "sentiment_pattern"))
+
     return df
 
 # print(read_name_sentiment_add_pattern())

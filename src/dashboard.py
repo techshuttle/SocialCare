@@ -14,8 +14,11 @@ df_tweets = read_name_tweet_ner_key_phrase()
 df_tweets=df_tweets.fillna("no tweet today")
 STOPWORDS = ["https", "co", "RT","S","LA","T","ALWAYS"] + list(STOPWORDS)
 
+import matplotlib.pyplot as plt
 #wordcloud
-word_cloud = wordcloud_by_tweets(df,"Sentiment")
+word_cloud = wordcloud_by_tweets(df_tweets['tweet'],"Sentiment")
+word_cloud
+
 
 #heatmap
 # fig_heatmap = px.imshow(data_heatmap,

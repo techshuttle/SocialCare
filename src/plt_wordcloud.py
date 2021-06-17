@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
-# from src.db_utils import read_name_tweet_ner_key_phrase
+from src.db_utils import read_name_tweet_ner_key_phrase
 from wordcloud import WordCloud, STOPWORDS
 
 
 from src.text_preprocess import preprocess
-# df = read_name_tweet_ner_key_phrase()
+df = read_name_tweet_ner_key_phrase()
 # # print(df.isnull().sum())
-# df=df.fillna("no tweet today")
+df=df.fillna("no tweet today")
 #
 # from src.db_utils import read_tweet_features_on_sentiment_type as df_divide
 # df_positive,df_negative = df_divide()
@@ -29,7 +29,7 @@ def wordcloud_by_tweets(tweets,title):
     stopwords.add("AMP")
 
     stopwords.add("lakh")
-    wc = WordCloud(background_color="white",stopwords=stopwords,random_state = 2016).generate(" ".join([i for i in df['tweet'].str.upper()]))
+    wc = WordCloud(background_color="white",stopwords=stopwords,random_state = 2016).generate(" ".join([i for i in tweets.str.upper()]))
     plt.imshow(wc)
     plt.axis("off")
     plt.title(title)
@@ -41,7 +41,8 @@ def wordcloud_by_tweets(tweets,title):
 
 #wordclouds
 
-# wordcloud_by_tweets(df,"overall")
+wordcloud_by_tweets(df['tweet'],"overall")
+# plt.show()
 # wordcloud_by_tweets(df_positive,"positive")
 # wordcloud_by_tweets(df_negative,"negative")
 # plt.show()
