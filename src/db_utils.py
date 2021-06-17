@@ -279,7 +279,7 @@ def alter_table():
     logger.info("Alter table successful")
     return 1
 
-print(alter_table())
+# print(alter_table())
 
 #read name and sentiment to DataFrame
 
