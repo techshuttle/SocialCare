@@ -274,16 +274,12 @@ def query_db(query,args=(), one=False):
 def alter_table():
     """ to add new column or delete a column to and from the table"""
 
-    cursor.execute("""ALTER TABLE Employee ADD COLUMN Sentiment_Type VARCHAR(250),
-                    ADD COLUMN tweet VARCHAR(250),
-                    ADD COLUMN ner VARCHAR(250),
-                    ADD COLUMN key_phrase VARCHAR(250),
-                    ADD COLUMN rcsa VARCHAR(250); """)
+    cursor.execute("""ALTER TABLE Employee ADD COLUMN twitter_sentiment_pattern VARCHAR(250); """)
     # cursor.execute("ALTER TABLE Tweet DROP email;")
     logger.info("Alter table successful")
     return 1
 
-# print(alter_table())
+print(alter_table())
 
 #read name and sentiment to DataFrame
 
