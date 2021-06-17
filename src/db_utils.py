@@ -321,7 +321,7 @@ def read_tweet_features_on_sentiment_type():
     df_negative = df[df["sentiment_type"]== "-1"]
     return df_positive,df_negative
 
-df_positive,df_negative = read_tweet_features_on_sentiment_type()
+# df_positive,df_negative = read_tweet_features_on_sentiment_type()
 # print(df_positive.head())
 
 
