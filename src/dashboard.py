@@ -102,7 +102,7 @@ def create_dash_application(flask_app):
 
             dcc.Graph(
                 id='graph3',
-                figure=fig_pie
+                figure=fig_bar
             ),
         ]),
         html.Div([
