@@ -9,7 +9,7 @@ import simplejson as json
 
 from flask import Flask, request, jsonify,render_template, redirect
 from flask.helpers import url_for
-from flask_bootstrap import Bootstrap
+
 from src import twitter_utils
 from src import db_utils as db
 from src.send_email import send_mail
@@ -36,7 +36,6 @@ logger.addHandler(stream_handler)
 
 app = Flask(__name__)
 
-# Bootstrap(app)
 
 create_dash_application(app)
 
@@ -52,8 +51,8 @@ def get_urls():
     result = {"result": []}
     twitter_id = data["twitter_id"]
     list_urls = db.get_url(twitter_id=twitter_id)
-    for id, twitter, linkedin in list_urls:
-        result["result"].append({"id": id, "linkedin": linkedin, "twitter": twitter})
+    for id, twitter in list_urls:
+        result["result"].append({"id": id, "twitter": twitter})
     logger.info(f"{result} is updated for get_urls")
     return jsonify(result=result)
 

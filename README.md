@@ -52,3 +52,8 @@ References
 15. Detailed blog on Dash - https://towardsdatascience.com/how-to-build-a-complex-reporting-dashboard-using-dash-and-plotl-4f4257c18a7f
 16. Color Scales in Plotly- https://plotly.com/python/builtin-colorscales/
 17. Deploying on Heroku - https://www.youtube.com/watch?v=b-M2KQ6_bM4
+18. WordCloud - https://www.kaggle.com/jagangupta/wordcloud-of-tweets
+19. Dash in Flask - https://github.com/okomarov/dash_on_flask
+
+Front-end
+20. Adding background images - https://www.youtube.com/watch?v=33IinMVJf-M

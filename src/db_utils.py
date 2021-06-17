@@ -77,7 +77,6 @@ def insert_data(id,name,twitter_id):
 
     twitter_sentiment = tweet_user_updated(twitter_id,max_tweets= 1)
 
-
     conn.autocommit = True
     try:
         cursor.execute("INSERT INTO Employee(id,name,twitter_id) VALUES (%s,%s,%s)",(id,name,twitter_id))
@@ -133,11 +132,12 @@ def get_url(twitter_id):
 
 #Update
 
-#function useful for API
+#Functions involving database, Twitter API(with Expert AI) to extract useful insights from tweets.
 
 def update_tweet(twitter_id):
+    """updating tweets to be used for aanalysis using twitter_id"""
     tweet = user_tweet_today(twitter_id)
-    print(tweet)
+    # print(tweet)
     try:
         tweet = cursor.execute("""UPDATE Employee SET tweet = %s WHERE twitter_id = %s """,(tweet, twitter_id ))
         logger.info(f"tweet for {twitter_id} updated successfully")
@@ -147,20 +147,27 @@ def update_tweet(twitter_id):
     return 1
 
 def update_tweet_from_ids():
-    """updating and checking the update of twitter sentiment for the user"""
+    """updating and checking the update of twitter sentiment for all twitter ids"""
     s = "SELECT twitter_id FROM Employee"
     cursor.execute(s)
     twitter_ids = cursor.fetchall()
     logger.info(f"{twitter_ids}")
     conn.commit()
     try:
-        list = [update_tweet(id[0]) for id in twitter_ids]
-        print(list)
+        list = []
+        for id in twitter_ids:
+            list.append(update_tweet(id[0]))
         logger.info(f"list of updated twitter sentiments - {list}")
         return list
     except Exception as e:
-        print(e)
-        return 0
+        return e
+    #     list = [update_tweet(id[0]) for id in twitter_ids]
+    #     print(list)
+    #     logger.info(f"list of updated twitter sentiments - {list}")
+    #     return list
+    # except Exception as e:
+    #     print(e)
+    #     return 0
 
 # print(update_tweet_from_ids())
 
@@ -180,7 +187,6 @@ def update_tweet_sentiment(twitter_id):
 # print(update_tweet_sentiment('@realDonaldTrump'))
 
 
-# import time
 def update_tweet_sentiment_from_ids():
     """updating and checking the update of twitter sentiment for the user"""
     s = "SELECT twitter_id FROM Employee"
@@ -198,7 +204,6 @@ def update_tweet_sentiment_from_ids():
         return 0
 
 # print(update_tweet_sentiment_from_ids())
-
 
 
 def get_twitter_sentiment_pattern_from_ids(twitter_id):
@@ -268,7 +273,8 @@ def query_db(query,args=(), one=False):
 
 def alter_table():
     """ to add new column or delete a column to and from the table"""
-    cursor.execute("""ALTER TABLE Employee ADD COLUMN Key_phrase VARCHAR(250); """)
+
+    cursor.execute("""ALTER TABLE Employee ADD COLUMN Sentiment_Type VARCHAR(250); """)
     # cursor.execute("ALTER TABLE Tweet DROP email;")
     logger.info("Alter table successful")
     return 1
@@ -293,17 +299,30 @@ def read_name_sentiment_add_pattern():
 # print(read_name_sentiment_add_pattern())
 
 def read_name_tweet_ner_key_phrase():
-    s = """SELECT id,name,tweet,ner,key_phrase from Employee;"""
+    """returns features useful for nlp analytics"""
+    s = """SELECT id,name,tweet,sentiment_type,ner,key_phrase from Employee;"""
     cursor.execute(s)
     employee = cursor.fetchall()
     # print(employee)
     logger.info(f"The {read_name_tweet_ner_key_phrase} is running")
     conn.commit()
 
-    df = pd.DataFrame(employee[1:], columns=("id", "name", "tweet", "ner","key_phrase"))
+    df = pd.DataFrame(employee[1:], columns=("id", "name", "tweet","sentiment_type", "ner","key_phrase"))
+    df[['tweet']].fillna("no tweet today")
     return df
 
 # print(read_name_tweet_ner_key_phrase().head())
+
+def read_tweet_features_on_sentiment_type():
+    """divides the read_name_tweet_ner_key_phrase dataframe wrt positive and negative sentiment"""
+    df = read_name_tweet_ner_key_phrase()
+    df[["sentiment_type"]].fillna(0)
+    df_positive = df[df["sentiment_type"]== "1"]
+    df_negative = df[df["sentiment_type"]== "-1"]
+    return df_positive,df_negative
+
+df_positive,df_negative = read_tweet_features_on_sentiment_type()
+# print(df_positive.head())
 
 
 
@@ -327,6 +346,7 @@ def get_twitter_sentiment_pattern_of_employee(twitter_id,max_tweets):
 
 import psycopg2.extras as psql_extras
 
+
 def insert_data_from_df(
     query: str,
     conn: psycopg2.extensions.connection,
@@ -334,6 +354,7 @@ def insert_data_from_df(
     df: pd.DataFrame,
     page_size: int
 ) -> None:
+    """To insert values from a dataframe to database"""
     data_tuples = [tuple(row.to_numpy()) for index, row in df.iterrows()]
     try:
         psql_extras.execute_values(
@@ -356,7 +377,11 @@ def insert_data_from_df(
 
 # For NER
 # tweet_user_NER
+
+######################################################Tweet NER#########################################################
+
 def update_tweet_NER(twitter_id):
+    """to add Named Entity Recognition values related to the tweet"""
     tweet_NER = (tweet_user_NER(twitter_id,1))
     # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
     print(tweet_NER)
@@ -370,7 +395,7 @@ def update_tweet_NER(twitter_id):
 
 
 def update_tweet_ner_from_ids():
-    """updating and checking the update of twitter sentiment for the user"""
+    """updating and checking the update of NER for the user"""
     s = "SELECT twitter_id FROM Employee"
     cursor.execute(s)
     twitter_ids = cursor.fetchall()
@@ -386,8 +411,9 @@ def update_tweet_ner_from_ids():
         return 0
 
 # print(update_tweet_ner_from_ids())
-
+####################################Key_Phrase#####################################################################
 def update_tweet_key_phrase(twitter_id):
+    """To update Key phrase used in the tweet.Provides useful information about the tweet."""
     tweet_key_phrase = (tweet_user_key_phrase(twitter_id,1))
     # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
     print(tweet_key_phrase)
@@ -401,7 +427,7 @@ def update_tweet_key_phrase(twitter_id):
 
 
 def update_tweet_key_phrase_from_ids():
-    """updating and checking the update of twitter sentiment for the user"""
+    """updating and checking the update of tweet key phrases for the user"""
     s = "SELECT twitter_id FROM Employee"
     cursor.execute(s)
     twitter_ids = cursor.fetchall()
@@ -417,3 +443,73 @@ def update_tweet_key_phrase_from_ids():
         return 0
 
 # print(update_tweet_key_phrase_from_ids())
+
+#####################################################RCSA###############################################################
+from src.twitter_utils import tweet_user_RCSA
+
+def update_tweet_RCSA(twitter_id):
+    """To update Key phrase used in the tweet.Provides useful information about the tweet."""
+    tweet_RCSA = (tweet_user_RCSA(twitter_id,1))
+    # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
+    # print(tweet_RCSA)
+    try:
+        sentiment = cursor.execute("""UPDATE Employee SET RCSA = %s WHERE twitter_id = %s """,(tweet_RCSA, twitter_id,))
+        logger.info(f"twitter RCSA for {twitter_id} updated successfully")
+    except Exception as error:
+        logger.error(f"{error}")
+        return print(error)
+    return 1
+
+
+def update_tweet_RCSA_from_ids():
+    """updating and checking the update of tweet key phrases for the user"""
+    s = "SELECT twitter_id FROM Employee"
+    cursor.execute(s)
+    twitter_ids = cursor.fetchall()
+    logger.info(f"{twitter_ids}")
+    conn.commit()
+    try:
+        list = [update_tweet_RCSA(id[0]) for id in twitter_ids]
+        print(list)
+        logger.info(f"list of updated twitter key phrases - {list}")
+        return list
+    except Exception as e:
+        print(e)
+        return 0
+
+# print(update_tweet_RCSA_from_ids())
+
+############################################Sentiment_type###########################################################
+from src.twitter_utils import tweet_user_sentiment_type
+def update_tweet_sentiment_type(twitter_id):
+    """To update Key phrase used in the tweet.Provides useful information about the tweet."""
+    sentiment_type = (tweet_user_sentiment_type(twitter_id))
+    # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
+    # print(sentiment_type)
+    try:
+        sentiment = cursor.execute("""UPDATE Employee SET sentiment_type = %s WHERE twitter_id = %s """,(sentiment_type, twitter_id,))
+        logger.info(f"twitter sentiment_type for {twitter_id} updated successfully")
+    except Exception as error:
+        logger.error(f"{error}")
+        return print(error)
+    return 1
+
+
+def update_tweet_sentiment_type_from_ids():
+    """updating and checking the update of tweet key phrases for the user"""
+    s = "SELECT twitter_id FROM Employee"
+    cursor.execute(s)
+    twitter_ids = cursor.fetchall()
+    logger.info(f"{twitter_ids}")
+    conn.commit()
+    try:
+        list = [update_tweet_sentiment_type(id[0]) for id in twitter_ids]
+        print(list)
+        logger.info(f"list of updated twitter key phrases - {list}")
+        return list
+    except Exception as e:
+        print(e)
+        return 0
+
+# print(update_tweet_sentiment_type_from_ids())
+

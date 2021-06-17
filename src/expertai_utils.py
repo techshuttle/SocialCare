@@ -37,7 +37,6 @@ def resource_concept_score_analysis(text):
     return [f'{main_concept.lemma:{20}} {main_concept.score:{5}}' for main_concept in document.main_syncons]
 
 
-
 def deep_linguistic_analysis(text):
     """returns POS for words in the text"""
     output = client.specific_resource_analysis(
@@ -58,7 +57,7 @@ def document_classification(text):
     # print(f'{"CATEGORY":{47}} {"IPTC ID":{10}} {"FREQUENCY":{8}}\n')
     return [f'{category.label:{47}} {category.id_:{10}}{category.frequency:{8}}' for category in document.categories]
 
-
+# Check if a single function can be made for behavioural traits and document classification.
 def behavioural_traits(text):
     taxonomy ='behavioral-traits'
     output = client.classification(
