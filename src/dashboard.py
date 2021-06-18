@@ -3,7 +3,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
 import pandas as pd
-from wordcloud import WordCloud,STOPWORDS
+from wordcloud import STOPWORDS
 from src.plt_wordcloud import wordcloud_by_tweets
 
 from src.db_utils import read_name_sentiment_add_pattern
@@ -11,13 +11,20 @@ df = read_name_sentiment_add_pattern()
 
 from src.db_utils import read_name_tweet_ner_key_phrase
 df_tweets = read_name_tweet_ner_key_phrase()
+
+from src.db_utils import read_tweet_features_on_sentiment_type as df_divide
+df_positive,df_negative = df_divide()
+
 # df_tweets=df_tweets.fillna("no tweet today")
 STOPWORDS = ["https", "co", "RT","S","LA","T","ALWAYS"] + list(STOPWORDS)
 
 import matplotlib.pyplot as plt
 #wordcloud
-word_cloud = wordcloud_by_tweets(df_tweets['tweet'],"Sentiment")
-word_cloud
+word_cloud_overall = wordcloud_by_tweets(df_tweets['tweet'],"Sentiment")
+word_cloud_positive = wordcloud_by_tweets(df_positive['tweet'],"Positive")
+word_cloud_negative = wordcloud_by_tweets(df_negative['tweet'],"Positive")
+
+# word_cloud
 
 
 #heatmap
@@ -102,12 +109,22 @@ def create_dash_application(flask_app):
             ),
         ]),
         html.Div([
-            html.H1(children="WordCloud"),
+            html.H1(children="WordCloud for Overall Sentiment"),
             html.Div(
-                children=[html.Img(src="data:image/png;base64," + word_cloud, style={'height': '60%', 'width': '60%'})])
+                children=[html.Img(src="data:image/png;base64," + word_cloud_overall, style={'height': '60%', 'width': '60%'})])
+        ]),
+        html.Div([
+            html.H1(children="WordCloud for Positive Tweets"),
+            html.Div(
+                children=[html.Img(src="data:image/png;base64," + word_cloud_positive, style={'height': '60%', 'width': '60%'})])
+            ]),
+        html.Div([
+            html.H1(children="WordCloud for Negative Tweets"),
+            html.Div(
+                children=[html.Img(src="data:image/png;base64," + word_cloud_negative,
+                                   style={'height': '60%', 'width': '60%'})])
         ])
         ])
-
 
 
     return dash_app

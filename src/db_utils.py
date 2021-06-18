@@ -236,33 +236,6 @@ def update_twitter_sentiment_pattern_from_ids():
 
 # print(update_twitter_sentiment_pattern_from_ids())
 
-#Delete
-
-def delete_records(twitter_id):
-    # sql_delete = "DELETE FROM Employee WHERE twitter_id = %s",(twitter_id)
-    try:
-        # conn.autocommit = True
-        cursor.execute("DELETE FROM Employee WHERE twitter_id = %s",(twitter_id,))
-        logger.info(f"{twitter_id} successfully deleted from Employee.")
-    except:
-        logger.warning(f"could not delete {twitter_id} from Employee.")
-        return 0
-    return 1
-
-# print(delete_records("@realDonaldTrump"))
-# print(delete_records("@aamir_khan"))
-
-
-def delete_all_records():
-    try:
-        cursor.execute("DELETE FROM Employee;")
-        logger.info("All records successfully deleted from Employee.")
-    except:
-        logger.warning(f"could not delete all records from Employee.")
-        return 0
-    return 1
-
-# print(delete_all_records())
 
 
 
@@ -282,15 +255,7 @@ def query_db(query,args=(), one=False):
     return (r[0] if r else None) if one else r
 
 
-def alter_table():
-    """ to add new column or delete a column to and from the table"""
 
-    cursor.execute("""ALTER TABLE Employee ADD COLUMN Tweet VARCHAR(700); """)
-    # cursor.execute("ALTER TABLE Employee DROP Tweet ;")
-    logger.info("Alter table successful")
-    return 1
-
-# print(alter_table())
 
 #read name and sentiment to DataFrame
 
@@ -306,7 +271,7 @@ def read_data_to_dataframe():
 
     return df
 
-# print(read_data_to_dataframe().columns)
+# print(read_data_to_dataframe().shape[1])
 
 def read_name_sentiment_add_pattern():
     """Reading id, name and sentiment of employee from the table"""
@@ -366,7 +331,7 @@ def get_twitter_sentiment_pattern_of_employee(twitter_id,max_tweets):
 
 # print(get_twitter_sentiment_pattern_of_employee("@PMOIndia",max_tweets = 20))
 
-import psycopg2.extras as psql_extras
+
 
 
 def insert_data_from_df(
@@ -377,6 +342,8 @@ def insert_data_from_df(
     page_size: int
 ) -> None:
     """To insert values from a dataframe to database"""
+    import psycopg2.extras as psql_extras
+
     data_tuples = [tuple(row.to_numpy()) for index, row in df.iterrows()]
     try:
         psql_extras.execute_values(
@@ -536,4 +503,45 @@ def update_tweet_sentiment_type_from_ids():
         return 0
 
 # print(update_tweet_sentiment_type_from_ids())
+
+
+def alter_table():
+    """ to add new column or delete a column to and from the table"""
+
+    # cursor.execute("""ALTER TABLE Employee ADD COLUMN Tweet VARCHAR(700); """)
+    cursor.execute("ALTER TABLE Employee DROP Linkedin_url ;")
+    logger.info("Alter table successful")
+    return 1
+
+# print(alter_table())
+
+
+#Delete
+
+def delete_records(twitter_id):
+    # sql_delete = "DELETE FROM Employee WHERE twitter_id = %s",(twitter_id)
+    try:
+        # conn.autocommit = True
+        cursor.execute("DELETE FROM Employee WHERE twitter_id = %s",(twitter_id,))
+        logger.info(f"{twitter_id} successfully deleted from Employee.")
+    except:
+        logger.warning(f"could not delete {twitter_id} from Employee.")
+        return 0
+    return 1
+
+# print(delete_records("@realDonaldTrump"))
+# print(delete_records("@aamir_khan"))
+
+
+def delete_all_records():
+    try:
+        cursor.execute("DELETE FROM Employee;")
+        logger.info("All records successfully deleted from Employee.")
+    except:
+        logger.warning(f"could not delete all records from Employee.")
+        return 0
+    return 1
+
+# print(delete_all_records())
+
 

@@ -87,7 +87,7 @@ def tweet_user_key_phrase(username,max_tweets):
         tweet = [
             [key_phrase_extraction(preprocess(tweet.full_text)) if tweet.created_at > datetime.now() - timedelta(days=7) else 0] for
             tweet in tweets]
-    return tweet[0][0][0]
+    return tweet[0][0]
 
 def tweet_user_NER(username,max_tweets):
     tweets = tweepy.Cursor(api.user_timeline, id=username, tweet_mode='extended').items(max_tweets)
@@ -96,7 +96,7 @@ def tweet_user_NER(username,max_tweets):
             [named_entity_extraction(preprocess(tweet.full_text)) if tweet.created_at > datetime.now() - timedelta(
                 days=7) else 0] for
             tweet in tweets]
-    return tweet[0][0][0]
+    return tweet[0][0]
 
 def tweet_user_RCSA(username,max_tweets):
     """Resource Concept Score Analysis """

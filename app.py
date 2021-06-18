@@ -146,11 +146,15 @@ def get_member_sentiment():
     logger.info(f"{result} is updated for get_user_sentiment")
     return jsonify(result=result)
 
+### Temperory provision###############################Check alternative
 @app.route("/update_database_to_df", methods = ["GET"])
 def update_database_to_df():
     update = db.read_data_to_dataframe()
-    results = update.head()
-    return results
+    if update.shape[1] == 10:
+        return jsonify({"result":"success"})
+    else:
+        return jsonify({"result":"DataFrame not updated"})
+
 
 
 if __name__ == "__main__":
