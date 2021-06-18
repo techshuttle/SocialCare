@@ -294,36 +294,46 @@ def alter_table():
 
 #read name and sentiment to DataFrame
 
-def read_name_sentiment_add_pattern():
-    """Reading id, name and sentiment of employee from the table"""
+def read_data_to_dataframe():
+    """Updating our DataBase data to Dataframe"""
 
-    s = """SELECT id,name,tweet_sentiment,twitter_sentiment_pattern from Employee;"""
+    s = """SELECT id,name,twitter_id,tweet,tweet_sentiment,sentiment_type,twitter_sentiment_pattern,ner,key_phrase,rcsa FROM Employee;"""
     cursor.execute(s)
     employee = cursor.fetchall()
-    # print(employee)
-    logger.info(f"The sentiments of the employees are added")
+    logger.info(f"The data of the employees are added")
     conn.commit()
-
-    df = pd.DataFrame(employee[1:], columns=("id", "name", "sentiment_today", "sentiment_pattern"))
+    df = pd.DataFrame(employee[1:], columns=("id", "name","twitter_id","tweet","tweet_sentiment","sentiment_type", "twitter_sentiment_pattern" ,"ner","key_phrase","rcsa"))
 
     return df
 
-# print(read_name_sentiment_add_pattern())
+# print(read_data_to_dataframe().columns)
+
+def read_name_sentiment_add_pattern():
+    """Reading id, name and sentiment of employee from the table"""
+    df = read_data_to_dataframe()
+    df = df[["id","name","tweet_sentiment", "twitter_sentiment_pattern"]]
+
+    # df = pd.DataFrame(employee[1:], columns=("id", "name", "sentiment_today", "sentiment_pattern"))
+
+    return df
+
+# print(read_name_sentiment_add_pattern().head())
 
 def read_name_tweet_ner_key_phrase():
     """returns features useful for nlp analytics"""
-    s = """SELECT id,name,tweet,sentiment_type,ner,key_phrase from Employee;"""
-    cursor.execute(s)
-    employee = cursor.fetchall()
-    # print(employee)
+    df = read_data_to_dataframe()
+    df = df[["id","name","tweet","sentiment_type","ner","key_phrase"]]
     logger.info(f"The {read_name_tweet_ner_key_phrase} is running")
     conn.commit()
-
-    df = pd.DataFrame(employee[1:], columns=("id", "name", "tweet","sentiment_type", "ner","key_phrase"))
-    df[['tweet']].fillna("no tweet today")
+    df[['tweet']].fillna("no tweet")
     return df
+    # # df = pd.DataFrame(employee[1:], columns=("id", "name", "tweet","sentiment_type", "ner","key_phrase"))
+    # df[['tweet']].fillna("no tweet")
+    # # df[['sentiment_type']].fillna("0")
+    # # df[["key_phrase"]].fillna("0")
+    # return df
 
-# print(read_name_tweet_ner_key_phrase().head())
+# print(read_name_tweet_ner_key_phrase().info())
 
 def read_tweet_features_on_sentiment_type():
     """divides the read_name_tweet_ner_key_phrase dataframe wrt positive and negative sentiment"""

@@ -11,7 +11,7 @@ df = read_name_sentiment_add_pattern()
 
 from src.db_utils import read_name_tweet_ner_key_phrase
 df_tweets = read_name_tweet_ner_key_phrase()
-df_tweets=df_tweets.fillna("no tweet today")
+# df_tweets=df_tweets.fillna("no tweet today")
 STOPWORDS = ["https", "co", "RT","S","LA","T","ALWAYS"] + list(STOPWORDS)
 
 import matplotlib.pyplot as plt
@@ -33,7 +33,7 @@ word_cloud
 
 #for pie chart
 try:
-    df["sentiment_binary"] = df["sentiment_today"].apply(lambda x: "negative" if x < 0 else "positive")
+    df["sentiment_binary"] = df["tweet_sentiment"].apply(lambda x: "negative" if x < 0 else "positive")
     day_sentiment_counts = df['sentiment_binary'].value_counts()
 
     # # pie chart
@@ -46,7 +46,7 @@ except Exception as e:
 fig_bar = px.bar(
     data_frame= df,
     x = 'name',
-    y = 'sentiment_today',
+    y = 'tweet_sentiment',
     opacity= 0.9,
     orientation="v",
     barmode= 'relative',

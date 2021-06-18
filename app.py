@@ -1,3 +1,4 @@
+import datetime
 import logging
 import logging.config
 import os
@@ -144,6 +145,13 @@ def get_member_sentiment():
         result["result"].append({"id": id, "name": name, "sentiment": sentiment, "sentiment_pattern":sentiment_pattern})
     logger.info(f"{result} is updated for get_user_sentiment")
     return jsonify(result=result)
+
+@app.route("/update_database_to_df", methods = ["GET"])
+def update_database_to_df():
+    update = db.read_data_to_dataframe()
+    results = update.head()
+    return results
+
 
 if __name__ == "__main__":
     logging.info('App started and is running successfully')
