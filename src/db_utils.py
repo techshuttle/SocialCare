@@ -63,8 +63,7 @@ def create_table():
     sql = """CREATE TABLE IF NOT EXISTS EMPLOYEE(
             id SERIAL PRIMARY KEY,
             Name Text NOT NULL,
-            twitter_id VARCHAR(250),
-            linkedin_url VARCHAR(250));
+            twitter_id VARCHAR(250);
             """
     conn.autocommit = True
     cursor = conn.cursor()
@@ -130,12 +129,15 @@ def get_url(twitter_id):
         # print(urls)
         return urls
 
+# print(get_url(twitter_id= None))
+
 #Update
 
 #Functions involving database, Twitter API(with Expert AI) to extract useful insights from tweets.
 
 def update_tweet(twitter_id):
     """updating tweets to be used for aanalysis using twitter_id"""
+
     tweet = user_tweet_today(twitter_id)
     # print(tweet)
     try:
@@ -146,6 +148,8 @@ def update_tweet(twitter_id):
         return print(error)
     return 1
 
+# print(update_tweet("@BarackObama"))
+
 def update_tweet_from_ids():
     """updating and checking the update of twitter sentiment for all twitter ids"""
     s = "SELECT twitter_id FROM Employee"
@@ -154,20 +158,13 @@ def update_tweet_from_ids():
     logger.info(f"{twitter_ids}")
     conn.commit()
     try:
-        list = []
-        for id in twitter_ids:
-            list.append(update_tweet(id[0]))
+        list = [update_tweet(id[0]) for id in twitter_ids]
+        print(list)
         logger.info(f"list of updated twitter sentiments - {list}")
         return list
     except Exception as e:
-        return e
-    #     list = [update_tweet(id[0]) for id in twitter_ids]
-    #     print(list)
-    #     logger.info(f"list of updated twitter sentiments - {list}")
-    #     return list
-    # except Exception as e:
-    #     print(e)
-    #     return 0
+        print(e)
+        return 0
 
 # print(update_tweet_from_ids())
 
@@ -205,7 +202,7 @@ def update_tweet_sentiment_from_ids():
 
 # print(update_tweet_sentiment_from_ids())
 
-
+#Rename this function
 def get_twitter_sentiment_pattern_from_ids(twitter_id):
     twitter_sentiment_pattern = tweet_user_updated(twitter_id,max_tweets= 15)
     logger.info(f"{twitter_sentiment_pattern}")
@@ -219,7 +216,7 @@ def get_twitter_sentiment_pattern_from_ids(twitter_id):
 
 # print(get_twitter_sentiment_pattern_from_ids("@ricky_martin"))
 
-#check the function
+
 def update_twitter_sentiment_pattern_from_ids():
     """updating and checking the update of twitter sentiment for the user"""
     s = "SELECT twitter_id FROM Employee"
@@ -252,7 +249,21 @@ def delete_records(twitter_id):
         return 0
     return 1
 
+# print(delete_records("@realDonaldTrump"))
 # print(delete_records("@aamir_khan"))
+
+
+def delete_all_records():
+    try:
+        cursor.execute("DELETE FROM Employee;")
+        logger.info("All records successfully deleted from Employee.")
+    except:
+        logger.warning(f"could not delete all records from Employee.")
+        return 0
+    return 1
+
+# print(delete_all_records())
+
 
 
 #Other useful functions
@@ -274,8 +285,8 @@ def query_db(query,args=(), one=False):
 def alter_table():
     """ to add new column or delete a column to and from the table"""
 
-    cursor.execute("""ALTER TABLE Employee ADD COLUMN twitter_sentiment_pattern VARCHAR(250); """)
-    # cursor.execute("ALTER TABLE Tweet DROP email;")
+    cursor.execute("""ALTER TABLE Employee ADD COLUMN Tweet VARCHAR(700); """)
+    # cursor.execute("ALTER TABLE Employee DROP Tweet ;")
     logger.info("Alter table successful")
     return 1
 
@@ -370,8 +381,8 @@ def insert_data_from_df(
 
     else:
         conn.commit()
-
-# data = pd.read_csv("top_100_twitter.csv")
+#
+# data = pd.read_csv("top_100_twitter_handles.csv")
 # member_query = "INSERT INTO Employee(id, name,twitter_id) VALUES %s"
 # insert_data_from_df(member_query,conn, cursor,data,100)
 #
@@ -394,6 +405,7 @@ def update_tweet_NER(twitter_id):
         return print(error)
     return 1
 
+# print(update_tweet_NER("@TheEconomist"))
 
 def update_tweet_ner_from_ids():
     """updating and checking the update of NER for the user"""
@@ -495,6 +507,7 @@ def update_tweet_sentiment_type(twitter_id):
         return print(error)
     return 1
 
+# print(update_tweet_sentiment_type("@TheEconomist"))
 
 def update_tweet_sentiment_type_from_ids():
     """updating and checking the update of tweet key phrases for the user"""
@@ -506,7 +519,7 @@ def update_tweet_sentiment_type_from_ids():
     try:
         list = [update_tweet_sentiment_type(id[0]) for id in twitter_ids]
         print(list)
-        logger.info(f"list of updated twitter key phrases - {list}")
+        logger.info(f"list of updated twitter sentiment type - {list}")
         return list
     except Exception as e:
         print(e)

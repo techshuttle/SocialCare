@@ -57,7 +57,7 @@ def get_urls():
     return jsonify(result=result)
 
 
-@app.route("/add_sentiment", methods=[ "POST"])
+@app.route("/add_sentiment", methods=[ "GET"])
 def add_sentiment():
     list_sentiments = db.update_tweet_sentiment_from_ids()
     logger.info(f"status of sentiments {list_sentiments}")
@@ -78,10 +78,9 @@ def add_members():
         id = member["id"]
         name = member["name"]
         twitter_id = member["twitter_id"]
-        linkedin_url = member["linkedin_url"]
 
         # call database create/update function to add members
-        add_member = db.insert_data(id, name, twitter_id, linkedin_url)
+        add_member = db.insert_data(id, name, twitter_id)
 
         if add_member == 1:
             result.append({"status": "success"})
@@ -93,15 +92,17 @@ def add_members():
     return jsonify(result)
 
 
-@app.route("/get_members", methods=['POST'])
+@app.route("/get_members", methods=['GET'])
 def get_members():
     try:
-        list_members= db.read_record(twitter_id= None)
+        # list_members= db.read_record(twitter_id= None)
+        list_members = db.read_records()
         logger.info(f'{list_members} are shown from Employee table')
 
     except Exception as e:
         logger.error(f"{e}")
-    return json.dumps(list_members,use_decimal= True)
+    # return json.dumps(list_members,use_decimal= True)
+    return list_members
 
 @app.route("/remove_member", methods = ["GET"])
 def remove_member():

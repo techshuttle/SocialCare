@@ -54,10 +54,6 @@ fig_bar = px.bar(
 )
 
 
-
-
-
-
 app = dash.Dash(__name__)
 
 
@@ -102,7 +98,7 @@ def create_dash_application(flask_app):
 
             dcc.Graph(
                 id='graph3',
-                figure=fig_bar
+                figure=fig_pie
             ),
         ]),
         html.Div([
