@@ -24,17 +24,20 @@ word_cloud_overall = wordcloud_by_tweets(df_tweets['tweet'],"Sentiment")
 word_cloud_positive = wordcloud_by_tweets(df_positive['tweet'],"Positive")
 word_cloud_negative = wordcloud_by_tweets(df_negative['tweet'],"Positive")
 
-# word_cloud
 
 
+#Heatmap
+employees = df['name'].iloc[:10].to_list()
+tweet = ["Latest Tweet",2,3,4,5,6,7,8,9,"10th"]
+data_heatmap = df['twitter_sentiment_pattern'].iloc[:10].apply(eval).to_list()
 #heatmap
-# fig_heatmap = px.imshow(data_heatmap,
-#                 color_continuous_scale=px.colors.sequential.Emrld,
-#                 title = "15 tweet sentiment pattern",
-#                 labels = dict(x = "Tweet index", y = "Names"),
-#                 x= tweet,
-#                 y = employees)
-# fig_heatmap.update_xaxes(side= "top")
+fig_heatmap = px.imshow(data_heatmap,
+                color_continuous_scale=px.colors.sequential.Emrld,
+                title = "15 tweet sentiment pattern",
+                labels = dict(x = "Tweet index", y = "Names"),
+                x= tweet,
+                y = employees)
+fig_heatmap.update_xaxes(side= "top")
 
 
 
@@ -49,7 +52,8 @@ try:
     fig_pie.update_layout(legend= {"itemclick":False})
 except Exception as e:
     print("please add data")
-#bar graph
+
+#bar graph_overall
 fig_bar = px.bar(
     data_frame= df,
     x = 'name',
@@ -59,6 +63,33 @@ fig_bar = px.bar(
     barmode= 'relative',
     title="Updated Tweet Sentiment"
 )
+
+#Bar graph for negative tweets
+# Filter by Sentiment
+
+sentiment_selection_negative = (-40,-1)
+sentiment_selection_positive = (1,50)
+mask_positive = df["tweet_sentiment"].between(*sentiment_selection_positive)
+mask_negative = df["tweet_sentiment"].between(*sentiment_selection_negative)
+df_attend_negative = df[mask_negative]
+df_attend_positive = df[mask_positive]
+# print(df[mask].columns)
+#
+bar_negative = px.bar(df_attend_negative[['name','tweet_sentiment']],
+                   x = 'name',
+                   y = 'tweet_sentiment',
+                   text = 'tweet_sentiment',
+                   color_discrete_sequence= ['#F63366']*len(df_attend_negative),
+                   template= 'plotly_white'
+                   )
+
+bar_positive = px.bar(df_attend_positive[['name','tweet_sentiment']],
+                   x = 'name',
+                   y = 'tweet_sentiment',
+                   text = 'tweet_sentiment',
+                   color_discrete_sequence= ['#F63366']*len(df_attend_positive),
+                   template= 'plotly_white'
+                   )
 
 
 app = dash.Dash(__name__)
@@ -70,12 +101,12 @@ def create_dash_application(flask_app):
         url_base_pathname='/dash/')
 
     dash_app.layout = html.Div(children=[
-        #
+        #1- Bar
         html.Div([
-            html.H1(children="Pattern of last 15 tweets"),
+            html.H1(children="Sentiments of the Tweets today"),
 
             html.Div(children="""
-            The pattern will tell us about the positive and negative sentiments.
+            The pattern will tell us about how these twitter users feel today.
             """),
 
             dcc.Graph(
@@ -84,47 +115,81 @@ def create_dash_application(flask_app):
             )
         ]),
 
-        # New division for all elements in the new 'row' of the page
+        # 2 Pie
         html.Div([
-            html.H1(children="Today's sentiments"),
+            html.H1(children="Today's Overall sentiments"),
             html.Div(children="""
-            Polarity of the sentiment
+            The Pie Chart
             """),
 
             dcc.Graph(
                 id='graph2',
-                figure=fig_bar
+                figure=fig_pie
             ),
         ]),
-
+        # 3. WordCloud
         html.Div([
-            html.H1(children="Pie Chart"),
+            html.H1(children="Significant words used in the Overall Tweets"),
+            html.Div(
+                children=[html.Img(src="data:image/png;base64," + word_cloud_overall,
+                                   style={'height': '50%', 'width': '50%'})])
+        ]),
+        # 4. Heatmap
+        html.Div([
+            html.H1(children="Heatmap of Twitter users vs type of sentiment"),
             html.Div(children="""
             Insights on tweets with positive and negative sentiment
             """),
 
             dcc.Graph(
                 id='graph3',
-                figure=fig_pie
+                figure=fig_heatmap
             ),
         ]),
+        # 5. Positive Bar
         html.Div([
-            html.H1(children="WordCloud for Overall Sentiment"),
-            html.Div(
-                children=[html.Img(src="data:image/png;base64," + word_cloud_overall, style={'height': '60%', 'width': '60%'})])
+            html.H1(children="Pattern of Positive Tweets"),
+
+            html.Div(children="""
+                    The pattern will tell us about the positive sentiments today.
+                    """),
+
+            dcc.Graph(
+                id='graph5',
+                figure=bar_positive
+            )
         ]),
+        # 6. Positive WordCloud
         html.Div([
-            html.H1(children="WordCloud for Positive Tweets"),
+            html.H1(children="Words people use for their Tweets being positive"),
             html.Div(
-                children=[html.Img(src="data:image/png;base64," + word_cloud_positive, style={'height': '60%', 'width': '60%'})])
-            ]),
+                children=[html.Img(src="data:image/png;base64," + word_cloud_positive,
+                                   style={'height': '50%', 'width': '50%'})])
+        ]),
+        # 7.Negative Tweets
         html.Div([
-            html.H1(children="WordCloud for Negative Tweets"),
+            html.H1(children="Negative Tweet Sentiment"),
+
+            html.Div(children="""
+                It tells us who don't feel much good today about somthing.
+                """),
+
+            dcc.Graph(
+                id='graph4',
+                figure=bar_negative
+            )
+        ]),
+        # 8. Negative WordCloud
+        html.Div([
+            html.H1(children="Words people express to show their negative sentiment about somthing."),
             html.Div(
-                children=[html.Img(src="data:image/png;base64," + word_cloud_negative,
-                                   style={'height': '60%', 'width': '60%'})])
+                children=[html.Img(src="data:image/png;base64," + word_cloud_negative, style={'height': '50%', 'width': '50%'})])
         ])
         ])
 
 
     return dash_app
+
+
+# for staked bar graph - https://stackoverflow.com/questions/65306294/pandas-stacked-bar-chart-of-a-column-of-dictionaries-of-key-and-values
+# https://plotly.com/python/bar-charts/
