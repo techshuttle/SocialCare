@@ -6,7 +6,7 @@ import pandas as pd
 import psycopg2.extras
 # from configparser import ConfigParser
 from src.twitter_utils import tweet_user_updated,user_tweet_today,tweet_user_NER,tweet_user_key_phrase
-from src.expertai_utils import sentiment, key_phrase_extraction, named_entity_extraction
+from src.expertai_utils import sentiment, key_phrase_extraction, named_entity_extraction,resource_concept_score_analysis
 import logging
 
 logger = logging.getLogger(__name__)
@@ -146,8 +146,6 @@ def update_tweet(twitter_id):
     """updating tweets to be used for aanalysis using twitter_id"""
     try:
         tweet = user_tweet_today(twitter_id)
-    # print(tweet)
-
         tweet = cursor.execute("""UPDATE Employee SET tweet = %s WHERE twitter_id = %s """,(tweet, twitter_id ))
         logger.info(f"tweet for {twitter_id} updated successfully")
     except Exception as error:
@@ -226,7 +224,7 @@ def get_twitter_sentiment_pattern_from_ids(twitter_id):
         return 0
     return 1
 
-# print(get_twitter_sentiment_pattern_from_ids("@NFL"))
+# print(get_twitter_sentiment_pattern_from_ids("@danieltosh"))
 
 
 def update_twitter_sentiment_pattern_from_ids():
@@ -503,7 +501,7 @@ def delete_records(twitter_id):
         return 0
     return 1
 
-# print(delete_records("@realDonaldTrump"))
+# print(delete_records("@danieltosh"))
 # print(delete_records("@aamir_khan"))
 
 
@@ -520,77 +518,6 @@ def delete_records(twitter_id):
 # print(delete_all_records())
 
 
-#
-# def to_df():
-#     cursor.execute("""SELECT id,name,twitter_id FROM Employee""")
-#     employee = cursor.fetchmany(5)
-#     logger.info(f"The data of the employees are added")
-#     conn.commit()
-#     df = pd.DataFrame(employee[1:], columns=("id", "name", "twitter_id"))
-#     df["tweet"] = df["twitter_id"].apply(lambda x: user_tweet_today(x))
-#    # df["twitter_sentiment_pattern"] = df["twitter_id"].apply(lambda x :tweet_user_updated(x,max_tweets= 10) )
-#
-#     return df
-#
-# # data = to_df()
-#
-# def to_df_new():
-#     df = to_df()
-#     df['tweet_sentiment'] = df['tweet'].apply(lambda x: sentiment(x))
-#     df['NER'] = df['tweet'].apply(lambda x: named_entity_extraction(x))
-#     df['Key_Phrase'] = df['tweet'].apply(lambda x: key_phrase_extraction(x))
-#     # df['rcsa'] = df['tweet'].apply(lambda x: res(x) )
-#     logger.info(f"The data of the df are added")
-#     return df
-#
-# # print(to_df_new()['twitter_id'])
-#
-# #
-# def insert_data_from_df_twitter_id(twitter_id):
-#     try:
-#         df = to_df_new()
-#         df_twitter_id = df[df["twitter_id"] == twitter_id]
-#         tweet = df_twitter_id['tweet'].to_list()[0]
-#         twitter_sentiment = df_twitter_id['tweet_sentiment'].to_list()[0]
-#         NER = df_twitter_id['NER'].to_list()[0]
-#         Key_Phrase = df_twitter_id['Key_Phrase'].to_list()[0]
-#     # except Exception as e:
-#     #     return e
-#         update = cursor.execute("""UPDATE Employee
-#                                         SET tweet = %s,
-#                                             tweet_sentiment = %s,
-#                                             NER = %s,
-#                                             Key_phrase = %s
-#                                             WHERE twitter_id = %s""",(tweet,twitter_sentiment,NER,Key_Phrase,twitter_id))
-#         logger.info(f"twitter values for {twitter_id} updated successfully again.")
-#     except Exception as error:
-#         logger.error(f"{error}")
-#         return print(error)
-#     return 1
-#
-#     # return twitter_sentiment
-#
-# # print(insert_data_from_df_twitter_id("@neymarjr"))
-#
-#
-# def update_data_from_dataframe_using_twitter_ids():
-#     """updating and checking the update of tweet key phrases for the user"""
-#     s = "SELECT twitter_id FROM Employee"
-#     cursor.execute(s)
-#     twitter_ids = cursor.fetchmany(5)
-#     logger.info(f"{twitter_ids}")
-#     conn.commit()
-#     try:
-#         list = [insert_data_from_df_twitter_id(id[0]) for id in twitter_ids]
-#         print(list)
-#         logger.info(f"list of updated twitter sentiment type - {list}")
-#         return list
-#     except Exception as e:
-#         print(e)
-#         return 0
-#
-# print(update_data_from_dataframe_using_twitter_ids())
-#working
 
 #
 # def insert_data_from_df(

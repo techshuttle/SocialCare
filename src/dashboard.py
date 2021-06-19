@@ -32,7 +32,7 @@ data_heatmap = df['twitter_sentiment_pattern'].iloc[:10].apply(eval).to_list()
 
 fig_heatmap = px.imshow(data_heatmap,
                 color_continuous_scale=px.colors.sequential.Emrld,
-                title = "15 tweet sentiment pattern",
+                title = "10 tweet sentiment pattern",
                 labels = dict(x = "Tweet index", y = "Names"),
                 x= tweet,
                 y = employees)
@@ -134,7 +134,7 @@ def create_dash_application(flask_app):
                 children=[html.Img(src="data:image/png;base64," + word_cloud_overall,
                                    style={'height': '50%', 'width': '50%'})])
         ]),
-        # 4. Heatmap
+        #4. Heatmap
         html.Div([
             html.H1(children="Heatmap of Twitter users vs type of sentiment"),
             html.Div(children="""
