@@ -6,6 +6,7 @@ import pandas as pd
 import psycopg2.extras
 # from configparser import ConfigParser
 from src.twitter_utils import tweet_user_updated,user_tweet_today,tweet_user_NER,tweet_user_key_phrase
+from src.expertai_utils import sentiment, key_phrase_extraction, named_entity_extraction
 import logging
 
 logger = logging.getLogger(__name__)
@@ -63,7 +64,13 @@ def create_table():
     sql = """CREATE TABLE IF NOT EXISTS EMPLOYEE(
             id SERIAL PRIMARY KEY,
             Name Text NOT NULL,
-            twitter_id VARCHAR(250);
+            twitter_id VARCHAR(250),
+            tweet VARCHAR(500),
+            tweet_sentiment VARCHAR(250),
+            twitter_sentiment_pattern VARCHAR(250),
+            key_phrase VARCHAR(250),
+            ner VARCHAR(250),
+            rcsa VARCHAR(250), ;
             """
     conn.autocommit = True
     cursor = conn.cursor()
@@ -137,10 +144,10 @@ def get_url(twitter_id):
 
 def update_tweet(twitter_id):
     """updating tweets to be used for aanalysis using twitter_id"""
-
-    tweet = user_tweet_today(twitter_id)
-    # print(tweet)
     try:
+        tweet = user_tweet_today(twitter_id)
+    # print(tweet)
+
         tweet = cursor.execute("""UPDATE Employee SET tweet = %s WHERE twitter_id = %s """,(tweet, twitter_id ))
         logger.info(f"tweet for {twitter_id} updated successfully")
     except Exception as error:
@@ -148,7 +155,8 @@ def update_tweet(twitter_id):
         return print(error)
     return 1
 
-# print(update_tweet("@BarackObama"))
+# print(update_tweet("@realDonaldTrump"))
+# print(update_tweet("@ArianaGrande"))
 
 def update_tweet_from_ids():
     """updating and checking the update of twitter sentiment for all twitter ids"""
@@ -170,18 +178,20 @@ def update_tweet_from_ids():
 
 
 def update_tweet_sentiment(twitter_id):
-    tweet_sentiment = (tweet_user_updated(twitter_id,1))
-    # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
-    print(tweet_sentiment)
     try:
+        tweet_sentiment = (tweet_user_updated(twitter_id,1))
+    # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
+        print(tweet_sentiment)
+
         sentiment = cursor.execute("""UPDATE Employee SET tweet_sentiment = %s WHERE twitter_id = %s """,(tweet_sentiment, twitter_id ))
         logger.info(f"twitter sentiment for {twitter_id} updated successfully")
     except Exception as error:
         logger.error(f"{error}")
         return print(error)
     return 1
-
+########Test like this on all similar files.
 # print(update_tweet_sentiment('@realDonaldTrump'))
+# print(update_tweet_sentiment("@ArianaGrande"))
 
 
 def update_tweet_sentiment_from_ids():
@@ -204,9 +214,11 @@ def update_tweet_sentiment_from_ids():
 
 #Rename this function
 def get_twitter_sentiment_pattern_from_ids(twitter_id):
-    twitter_sentiment_pattern = tweet_user_updated(twitter_id,max_tweets= 15)
-    logger.info(f"{twitter_sentiment_pattern}")
+
     try:
+        twitter_sentiment_pattern = tweet_user_updated(twitter_id,max_tweets= 10)
+        logger.info(f"{twitter_sentiment_pattern}")
+
         add = cursor.execute("""UPDATE Employee SET twitter_sentiment_pattern = %s WHERE twitter_id = %s""",(twitter_sentiment_pattern,twitter_id,))
         logger.info(f"twitter sentiment pattern for {twitter_id} updated successfully")
     except Exception as error:
@@ -214,14 +226,14 @@ def get_twitter_sentiment_pattern_from_ids(twitter_id):
         return 0
     return 1
 
-# print(get_twitter_sentiment_pattern_from_ids("@ricky_martin"))
+# print(get_twitter_sentiment_pattern_from_ids("@NFL"))
 
 
 def update_twitter_sentiment_pattern_from_ids():
     """updating and checking the update of twitter sentiment for the user"""
     s = "SELECT twitter_id FROM Employee"
     cursor.execute(s)
-    twitter_ids = cursor.fetchmany(30)
+    twitter_ids = cursor.fetchall()
     # print(twitter_ids)
     conn.commit()
     try:
@@ -235,8 +247,6 @@ def update_twitter_sentiment_pattern_from_ids():
         return e
 
 # print(update_twitter_sentiment_pattern_from_ids())
-
-
 
 
 #Other useful functions
@@ -271,15 +281,12 @@ def read_data_to_dataframe():
 
     return df
 
-# print(read_data_to_dataframe().shape[1])
+# print(read_data_to_dataframe())
 
 def read_name_sentiment_add_pattern():
     """Reading id, name and sentiment of employee from the table"""
     df = read_data_to_dataframe()
     df = df[["id","name","tweet_sentiment", "twitter_sentiment_pattern"]]
-
-    # df = pd.DataFrame(employee[1:], columns=("id", "name", "sentiment_today", "sentiment_pattern"))
-
     return df
 
 # print(read_name_sentiment_add_pattern().head())
@@ -287,16 +294,11 @@ def read_name_sentiment_add_pattern():
 def read_name_tweet_ner_key_phrase():
     """returns features useful for nlp analytics"""
     df = read_data_to_dataframe()
-    df = df[["id","name","tweet","sentiment_type","ner","key_phrase"]]
+    df = df[["id","name","tweet","tweet_sentiment","rcsa","sentiment_type","ner","key_phrase"]]
     logger.info(f"The {read_name_tweet_ner_key_phrase} is running")
     conn.commit()
     df[['tweet']].fillna("no tweet")
     return df
-    # # df = pd.DataFrame(employee[1:], columns=("id", "name", "tweet","sentiment_type", "ner","key_phrase"))
-    # df[['tweet']].fillna("no tweet")
-    # # df[['sentiment_type']].fillna("0")
-    # # df[["key_phrase"]].fillna("0")
-    # return df
 
 # print(read_name_tweet_ner_key_phrase().info())
 
@@ -310,7 +312,6 @@ def read_tweet_features_on_sentiment_type():
 
 # df_positive,df_negative = read_tweet_features_on_sentiment_type()
 # print(df_positive.head())
-
 
 
 def get_twitter_sentiment_pattern_of_employee(twitter_id,max_tweets):
@@ -334,36 +335,6 @@ def get_twitter_sentiment_pattern_of_employee(twitter_id,max_tweets):
 
 
 
-def insert_data_from_df(
-    query: str,
-    conn: psycopg2.extensions.connection,
-    cur: psycopg2.extensions.cursor,
-    df: pd.DataFrame,
-    page_size: int
-) -> None:
-    """To insert values from a dataframe to database"""
-    import psycopg2.extras as psql_extras
-
-    data_tuples = [tuple(row.to_numpy()) for index, row in df.iterrows()]
-    try:
-        psql_extras.execute_values(
-            cur, query, data_tuples, page_size=page_size)
-        print("Query:", cur.query)
-
-    except Exception as error:
-        print(f"{type(error).__name__}: {error}")
-        print("Query:", cur.query)
-        conn.rollback()
-        cur.close()
-
-    else:
-        conn.commit()
-#
-# data = pd.read_csv("top_100_twitter_handles.csv")
-# member_query = "INSERT INTO Employee(id, name,twitter_id) VALUES %s"
-# insert_data_from_df(member_query,conn, cursor,data,100)
-#
-
 # For NER
 # tweet_user_NER
 
@@ -371,10 +342,11 @@ def insert_data_from_df(
 
 def update_tweet_NER(twitter_id):
     """to add Named Entity Recognition values related to the tweet"""
-    tweet_NER = (tweet_user_NER(twitter_id,1))
-    # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
-    print(tweet_NER)
     try:
+        tweet_NER = (tweet_user_NER(twitter_id,1))
+    # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
+        print(tweet_NER)
+
         sentiment = cursor.execute("""UPDATE Employee SET ner = %s WHERE twitter_id = %s """,(tweet_NER, twitter_id ))
         logger.info(f"twitter NER for {twitter_id} updated successfully")
     except Exception as error:
@@ -404,10 +376,11 @@ def update_tweet_ner_from_ids():
 ####################################Key_Phrase#####################################################################
 def update_tweet_key_phrase(twitter_id):
     """To update Key phrase used in the tweet.Provides useful information about the tweet."""
-    tweet_key_phrase = (tweet_user_key_phrase(twitter_id,1))
-    # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
-    print(tweet_key_phrase)
     try:
+        tweet_key_phrase = (tweet_user_key_phrase(twitter_id,1))
+        # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
+        print(tweet_key_phrase)
+
         sentiment = cursor.execute("""UPDATE Employee SET key_phrase = %s WHERE twitter_id = %s """,(tweet_key_phrase, twitter_id,))
         logger.info(f"twitter key phrase for {twitter_id} updated successfully")
     except Exception as error:
@@ -439,10 +412,10 @@ from src.twitter_utils import tweet_user_RCSA
 
 def update_tweet_RCSA(twitter_id):
     """To update Key phrase used in the tweet.Provides useful information about the tweet."""
-    tweet_RCSA = (tweet_user_RCSA(twitter_id,1))
-    # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
-    # print(tweet_RCSA)
     try:
+        tweet_RCSA = (tweet_user_RCSA(twitter_id,1))
+        # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
+        # print(tweet_RCSA)
         sentiment = cursor.execute("""UPDATE Employee SET RCSA = %s WHERE twitter_id = %s """,(tweet_RCSA, twitter_id,))
         logger.info(f"twitter RCSA for {twitter_id} updated successfully")
     except Exception as error:
@@ -473,10 +446,11 @@ def update_tweet_RCSA_from_ids():
 from src.twitter_utils import tweet_user_sentiment_type
 def update_tweet_sentiment_type(twitter_id):
     """To update Key phrase used in the tweet.Provides useful information about the tweet."""
-    sentiment_type = (tweet_user_sentiment_type(twitter_id))
-    # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
-    # print(sentiment_type)
     try:
+        sentiment_type = (tweet_user_sentiment_type(twitter_id))
+        # tweet_sentiment = (tweet_user_updated(twitter_id, 1))
+        # print(sentiment_type)
+
         sentiment = cursor.execute("""UPDATE Employee SET sentiment_type = %s WHERE twitter_id = %s """,(sentiment_type, twitter_id,))
         logger.info(f"twitter sentiment_type for {twitter_id} updated successfully")
     except Exception as error:
@@ -504,14 +478,14 @@ def update_tweet_sentiment_type_from_ids():
 
 # print(update_tweet_sentiment_type_from_ids())
 
-
-def alter_table():
-    """ to add new column or delete a column to and from the table"""
-
-    # cursor.execute("""ALTER TABLE Employee ADD COLUMN Tweet VARCHAR(700); """)
-    cursor.execute("ALTER TABLE Employee DROP Linkedin_url ;")
-    logger.info("Alter table successful")
-    return 1
+#
+# def alter_table():
+#     """ to add new column or delete a column to and from the table"""
+#
+#     # cursor.execute("""ALTER TABLE Employee ADD COLUMN Tweet VARCHAR(700); """)
+#     cursor.execute("ALTER TABLE Employee DROP ;")
+#     logger.info("Alter table successful")
+#     return 1
 
 # print(alter_table())
 
@@ -533,15 +507,135 @@ def delete_records(twitter_id):
 # print(delete_records("@aamir_khan"))
 
 
-def delete_all_records():
-    try:
-        cursor.execute("DELETE FROM Employee;")
-        logger.info("All records successfully deleted from Employee.")
-    except:
-        logger.warning(f"could not delete all records from Employee.")
-        return 0
-    return 1
-
+# def delete_all_records():
+#     """to delete all records"""
+#     try:
+#         cursor.execute("DELETE FROM Employee;")
+#         logger.info("All records successfully deleted from Employee.")
+#     except:
+#         logger.warning(f"could not delete all records from Employee.")
+#         return 0
+#     return 1
+#
 # print(delete_all_records())
+
+
+#
+# def to_df():
+#     cursor.execute("""SELECT id,name,twitter_id FROM Employee""")
+#     employee = cursor.fetchmany(5)
+#     logger.info(f"The data of the employees are added")
+#     conn.commit()
+#     df = pd.DataFrame(employee[1:], columns=("id", "name", "twitter_id"))
+#     df["tweet"] = df["twitter_id"].apply(lambda x: user_tweet_today(x))
+#    # df["twitter_sentiment_pattern"] = df["twitter_id"].apply(lambda x :tweet_user_updated(x,max_tweets= 10) )
+#
+#     return df
+#
+# # data = to_df()
+#
+# def to_df_new():
+#     df = to_df()
+#     df['tweet_sentiment'] = df['tweet'].apply(lambda x: sentiment(x))
+#     df['NER'] = df['tweet'].apply(lambda x: named_entity_extraction(x))
+#     df['Key_Phrase'] = df['tweet'].apply(lambda x: key_phrase_extraction(x))
+#     # df['rcsa'] = df['tweet'].apply(lambda x: res(x) )
+#     logger.info(f"The data of the df are added")
+#     return df
+#
+# # print(to_df_new()['twitter_id'])
+#
+# #
+# def insert_data_from_df_twitter_id(twitter_id):
+#     try:
+#         df = to_df_new()
+#         df_twitter_id = df[df["twitter_id"] == twitter_id]
+#         tweet = df_twitter_id['tweet'].to_list()[0]
+#         twitter_sentiment = df_twitter_id['tweet_sentiment'].to_list()[0]
+#         NER = df_twitter_id['NER'].to_list()[0]
+#         Key_Phrase = df_twitter_id['Key_Phrase'].to_list()[0]
+#     # except Exception as e:
+#     #     return e
+#         update = cursor.execute("""UPDATE Employee
+#                                         SET tweet = %s,
+#                                             tweet_sentiment = %s,
+#                                             NER = %s,
+#                                             Key_phrase = %s
+#                                             WHERE twitter_id = %s""",(tweet,twitter_sentiment,NER,Key_Phrase,twitter_id))
+#         logger.info(f"twitter values for {twitter_id} updated successfully again.")
+#     except Exception as error:
+#         logger.error(f"{error}")
+#         return print(error)
+#     return 1
+#
+#     # return twitter_sentiment
+#
+# # print(insert_data_from_df_twitter_id("@neymarjr"))
+#
+#
+# def update_data_from_dataframe_using_twitter_ids():
+#     """updating and checking the update of tweet key phrases for the user"""
+#     s = "SELECT twitter_id FROM Employee"
+#     cursor.execute(s)
+#     twitter_ids = cursor.fetchmany(5)
+#     logger.info(f"{twitter_ids}")
+#     conn.commit()
+#     try:
+#         list = [insert_data_from_df_twitter_id(id[0]) for id in twitter_ids]
+#         print(list)
+#         logger.info(f"list of updated twitter sentiment type - {list}")
+#         return list
+#     except Exception as e:
+#         print(e)
+#         return 0
+#
+# print(update_data_from_dataframe_using_twitter_ids())
+#working
+
+#
+# def insert_data_from_df(
+#     query: str,
+#     conn: psycopg2.extensions.connection,
+#     cur: psycopg2.extensions.cursor,
+#     df: pd.DataFrame,
+#     page_size: int
+# ) -> None:
+#     """To insert values from a dataframe to database"""
+#     import psycopg2.extras as psql_extras
+#
+#     data_tuples = [tuple(row.to_numpy()) for index, row in df.iterrows()]
+#     try:
+#         psql_extras.execute_values(
+#             cur, query, data_tuples, page_size=page_size)
+#         print("Query:", cur.query)
+#         logger.info(f"insert_data_from_df updated")
+#
+#     except Exception as error:
+#         print(f"{type(error).__name__}: {error}")
+#         print("Query:", cur.query)
+#         conn.rollback()
+#         cur.close()
+#
+#     else:
+#         conn.commit()
+#
+# data = to_df_new()
+# member_query = "INSERT INTO Employee(id,name,twitter_id,tweet,twitter_sentiment_pattern,tweet_sentiment,ner,key_phrase) VALUES %s"
+# insert_data_from_df(member_query,conn, cursor,data,100)
+# print(insert_data_from_df())
+#
+# def read_data_to_dataframe_again():
+#     """Updating our DataBase data to Dataframe"""
+#
+#     s = """SELECT id,name,twitter_id,tweet,tweet_sentiment,sentiment_type,twitter_sentiment_pattern,ner,key_phrase,rcsa FROM Employee;"""
+#     cursor.execute(s)
+#     employee = cursor.fetchall()
+#     logger.info(f"The data of the employees are added")
+#     conn.commit()
+#     df = pd.DataFrame(employee[1:], columns=("id", "name","twitter_id","tweet","tweet_sentiment","sentiment_type", "twitter_sentiment_pattern" ,"ner","key_phrase","rcsa"))
+#
+#     return df
+
+# print(read_data_to_dataframe_again().head())
 
 

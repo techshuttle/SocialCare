@@ -1,6 +1,7 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_table
 import plotly.express as px
 import pandas as pd
 from wordcloud import STOPWORDS
@@ -24,13 +25,11 @@ word_cloud_overall = wordcloud_by_tweets(df_tweets['tweet'],"Sentiment")
 word_cloud_positive = wordcloud_by_tweets(df_positive['tweet'],"Positive")
 word_cloud_negative = wordcloud_by_tweets(df_negative['tweet'],"Positive")
 
-
-
 #Heatmap
 employees = df['name'].iloc[:10].to_list()
 tweet = ["Latest Tweet",2,3,4,5,6,7,8,9,"10th"]
 data_heatmap = df['twitter_sentiment_pattern'].iloc[:10].apply(eval).to_list()
-#heatmap
+
 fig_heatmap = px.imshow(data_heatmap,
                 color_continuous_scale=px.colors.sequential.Emrld,
                 title = "15 tweet sentiment pattern",
@@ -38,8 +37,6 @@ fig_heatmap = px.imshow(data_heatmap,
                 x= tweet,
                 y = employees)
 fig_heatmap.update_xaxes(side= "top")
-
-
 
 #for pie chart
 try:
@@ -90,6 +87,9 @@ bar_positive = px.bar(df_attend_positive[['name','tweet_sentiment']],
                    color_discrete_sequence= ['#F63366']*len(df_attend_positive),
                    template= 'plotly_white'
                    )
+
+# df_chart_summary
+df_tweets_summary = df_tweets[["id","name","tweet_sentiment","rcsa","tweet"]]
 
 
 app = dash.Dash(__name__)
@@ -184,6 +184,20 @@ def create_dash_application(flask_app):
             html.H1(children="Words people express to show their negative sentiment about somthing."),
             html.Div(
                 children=[html.Img(src="data:image/png;base64," + word_cloud_negative, style={'height': '50%', 'width': '50%'})])
+        ]),
+        html.Div([
+            html.H1(children="OverAll Summary of Tweets"),
+            html.Div(children=
+                        dash_table.DataTable(
+                            id='table',
+                            columns=[{"name":i,"id":i} for i in df_tweets_summary.columns],
+                            data=df_tweets_summary.to_dict('records'),
+                            style_header={'backgroundColor': 'rgb(30, 30, 30)'},
+                            style_cell={
+                            'backgroundColor': 'rgb(50, 50, 50)',
+                            'color': 'white'
+                            },))
+
         ])
         ])
 
@@ -193,3 +207,6 @@ def create_dash_application(flask_app):
 
 # for staked bar graph - https://stackoverflow.com/questions/65306294/pandas-stacked-bar-chart-of-a-column-of-dictionaries-of-key-and-values
 # https://plotly.com/python/bar-charts/
+
+
+# for dataframe styling - https://www.youtube.com/watch?v=twHtUFR7rtw

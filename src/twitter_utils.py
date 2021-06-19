@@ -106,7 +106,7 @@ def tweet_user_RCSA(username,max_tweets):
             [rcsa(preprocess(tweet.full_text)) if tweet.created_at > datetime.now() - timedelta(
                 days=7) else 0] for
             tweet in tweets]
-    return tweet
+    return tweet[0][0]
 
 
 
@@ -117,14 +117,14 @@ api = twitter_api()
 if __name__ == '__main__':
     name = "@ArianaGrande"
 #     # d = tweet_user_max_tweets(name,1)
-#     # a = tweet_user_updated(name ,10)
+#     a = tweet_user_updated(name ,10)
 #     # b = tweet_user_key_phrase(name,1)
 #     # c = tweet_user_NER(name,1)
-#     e = tweet_user_RCSA(name,1)
+    e = tweet_user_RCSA(name,1)
 #     f = tweet_user_sentiment_type(name)
 # # #     a = tweet_user("@rajatpaliwal319", 1)
 #     t = user_tweet_today(name)
-#     print(f)
+    print(e)
 #     # do your work here
 #     # end_time = datetime.now()
 #     # print('Duration: {}'.format(end_time - start_time))

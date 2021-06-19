@@ -34,7 +34,7 @@ def resource_concept_score_analysis(text):
         body={"document": {"text": text}},
         params={'language': "en", 'resource': 'relevants'})
     # print(f'{"CONCEPT":{20}} {"SCORE":{5}} \n')
-    return [f'{main_concept.lemma:{20}} {main_concept.score:{5}}' for main_concept in document.main_syncons]
+    return [f'{main_concept.lemma:{2}}: {main_concept.score:{1}}' for main_concept in document.main_syncons]
 
 
 def deep_linguistic_analysis(text):
