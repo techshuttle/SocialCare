@@ -117,19 +117,3 @@ def full_document_analysis(text):
     except Exception as e:
         return 0
 
-
-
-
-if __name__ == '__main__':
-
-    t = "This is not a great present"
-    # print(sentiment(t))
-    # print(named_entity_extraction(t))
-    # print(key_phrase_extraction(t))
-    # print(document_classification(t))
-    # print(deep_linguistic_analysis(t))
-    # print(relation_extraction(t))
-    # print(full_document_analysis(t))
-    # print(information_detection(t))
-    # print(resource_concept_score_analysis(t))
-    # print(behavioural_traits(t))

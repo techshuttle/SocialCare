@@ -1,15 +1,6 @@
 import matplotlib.pyplot as plt
-# from src.db_utils import read_name_tweet_ner_key_phrase
 from wordcloud import WordCloud, STOPWORDS
-
-
 from src.text_preprocess import preprocess
-# df = read_name_tweet_ner_key_phrase()
-# # print(df.isnull().sum())
-# df=df.fillna("no tweet today")
-#
-# from src.db_utils import read_tweet_features_on_sentiment_type as df_divide
-# df_positive,df_negative = df_divide()
 
 
 from wordcloud import WordCloud, STOPWORDS
@@ -41,10 +32,6 @@ def wordcloud_by_tweets(tweets,title):
 
 #wordclouds
 
-# wordcloud_by_tweets(df['tweet'],"overall")
-# plt.show()
-# wordcloud_by_tweets(df_positive['tweet'],"positive")
-# wordcloud_by_tweets(df_negative['tweet'],"negative")
-# plt.show()
+
 
 # Reference - https://www.kaggle.com/jagangupta/wordcloud-of-tweets

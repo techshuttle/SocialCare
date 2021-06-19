@@ -4,7 +4,6 @@ import logging.config
 import os
 import smtplib
 import psycopg2
-# import psycopg2.extras
 import config
 import simplejson as json
 
@@ -71,6 +70,30 @@ def add_sentiment():
         logger.info("failed to add sentiments")
     return jsonify(result)
 
+@app.route("/add_sentiment_pattern", methods = ["GET"])
+def add_sentiment_pattern():
+    list_pattern = db.update_twitter_sentiment_pattern_from_ids()
+    logger.info(f"{add_sentiment_pattern} is working")
+    if list_pattern[0] == 1:
+        result = {"status": "success"}
+        logger.info("added sentiment pattern successfully")
+    else:
+        result = {"status": "failure"}
+        logger.info("failed to add sentiment pattern")
+    return jsonify(result)
+
+@app.route("/add_rcsa", methods = ["GET"])
+def add_rcsa():
+    list_rcsa = db.update_tweet_RCSA_from_ids()
+    logger.info(f"{add_sentiment_pattern} is working")
+    if list_rcsa[0] == 1:
+        result = {"status": "success"}
+        logger.info("added rcsa successfully")
+    else:
+        result = {"status": "failure"}
+        logger.info("failed to add rcsa")
+    return jsonify(result)
+
 
 @app.route("/add_members", methods=['POST'])
 def add_members():
@@ -80,17 +103,14 @@ def add_members():
         id = member["id"]
         name = member["name"]
         twitter_id = member["twitter_id"]
-
         # call database create/update function to add members
         add_member = db.insert_data(id, name, twitter_id)
-
         if add_member == 1:
             result.append({"status": "success"})
             logger.info(f"{member} added successfully")
         else:
             result.append({"status": "failure"})
             logger.error(f"{member} couldn't be added.")
-
     return jsonify(result)
 
 
@@ -100,11 +120,11 @@ def get_members():
         # list_members= db.read_record(twitter_id= None)
         list_members = db.read_records()
         logger.info(f'{list_members} are shown from Employee table')
-
     except Exception as e:
         logger.error(f"{e}")
     # return json.dumps(list_members,use_decimal= True)
-    return list_members
+    return "success"
+
 
 @app.route("/remove_member", methods = ["GET"])
 def remove_member():
@@ -116,8 +136,6 @@ def remove_member():
     except Exception as e:
         logger.error(f"{e}")
     return jsonify({"status":"success"})
-
-
 
 
 @app.route("/notify", methods=["GET"])
@@ -152,7 +170,7 @@ def get_member_sentiment():
 @app.route("/update_database_to_df", methods = ["GET"])
 def update_database_to_df():
     update = db.read_data_to_dataframe()
-    if update.shape[1] == 10:
+    if update.shape[1] == 7:
         return jsonify({"result":"success"})
     else:
         return jsonify({"result":"DataFrame not updated"})

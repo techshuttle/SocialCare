@@ -10,20 +10,21 @@ from src.plt_wordcloud import wordcloud_by_tweets
 from src.db_utils import read_name_sentiment_add_pattern
 df = read_name_sentiment_add_pattern()
 
-from src.db_utils import read_name_tweet_ner_key_phrase
-df_tweets = read_name_tweet_ner_key_phrase()
-
-from src.db_utils import read_tweet_features_on_sentiment_type as df_divide
-df_positive,df_negative = df_divide()
-
-# df_tweets=df_tweets.fillna("no tweet today")
 STOPWORDS = ["https", "co", "RT","S","LA","T","ALWAYS"] + list(STOPWORDS)
+
+#dividing data based on positive and negative sentiments
+sentiment_selection_negative = (-40,-0.1)
+sentiment_selection_positive = (0.1,50)
+mask_positive = df["tweet_sentiment"].between(*sentiment_selection_positive)
+mask_negative = df["tweet_sentiment"].between(*sentiment_selection_negative)
+df_attend_negative = df[mask_negative]
+df_attend_positive = df[mask_positive]
 
 import matplotlib.pyplot as plt
 #wordcloud
-word_cloud_overall = wordcloud_by_tweets(df_tweets['tweet'],"Sentiment")
-word_cloud_positive = wordcloud_by_tweets(df_positive['tweet'],"Positive")
-word_cloud_negative = wordcloud_by_tweets(df_negative['tweet'],"Positive")
+word_cloud_overall = wordcloud_by_tweets(df['tweet'],"Sentiment")
+word_cloud_positive = wordcloud_by_tweets(df_attend_positive['tweet'],"Positive")
+word_cloud_negative = wordcloud_by_tweets(df_attend_negative['tweet'],"Positive")
 
 #Heatmap
 employees = df['name'].iloc[:10].to_list()
@@ -34,9 +35,13 @@ fig_heatmap = px.imshow(data_heatmap,
                 color_continuous_scale=px.colors.sequential.Emrld,
                 title = "10 tweet sentiment pattern",
                 labels = dict(x = "Tweet index", y = "Names"),
-                x= tweet,
+                x= ["1","2","3","4","5","6","7","8","9","10"],
                 y = employees)
 fig_heatmap.update_xaxes(side= "top")
+
+#size control of heatmap
+fig_heatmap.layout.height = 1200
+fig_heatmap.layout.width = 1200
 
 #for pie chart
 try:
@@ -64,12 +69,7 @@ fig_bar = px.bar(
 #Bar graph for negative tweets
 # Filter by Sentiment
 
-sentiment_selection_negative = (-40,-1)
-sentiment_selection_positive = (1,50)
-mask_positive = df["tweet_sentiment"].between(*sentiment_selection_positive)
-mask_negative = df["tweet_sentiment"].between(*sentiment_selection_negative)
-df_attend_negative = df[mask_negative]
-df_attend_positive = df[mask_positive]
+
 # print(df[mask].columns)
 #
 bar_negative = px.bar(df_attend_negative[['name','tweet_sentiment']],
@@ -89,7 +89,7 @@ bar_positive = px.bar(df_attend_positive[['name','tweet_sentiment']],
                    )
 
 # df_chart_summary
-df_tweets_summary = df_tweets[["id","name","tweet_sentiment","rcsa","tweet"]]
+df_tweets_summary = df[["id","name","tweet_sentiment","rcsa","tweet"]]
 
 
 app = dash.Dash(__name__)
@@ -210,3 +210,4 @@ def create_dash_application(flask_app):
 
 
 # for dataframe styling - https://www.youtube.com/watch?v=twHtUFR7rtw
+# increasing size of heatmap - https://stackoverflow.com/questions/64234757/plotly-express-heatmap-cell-size
