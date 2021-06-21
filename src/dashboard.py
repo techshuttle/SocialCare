@@ -97,10 +97,13 @@ app = dash.Dash(__name__)
 
 def create_dash_application(flask_app):
     dash_app = dash.Dash(
-        server=flask_app,name="Dashboard",
+        server=flask_app, name="Dashboard",
         url_base_pathname='/dash/')
 
-    dash_app.layout = html.Div(children=[
+    dash_app.layout = html.Div([ html.Img(src="../static/logo.jpg"),
+        html.Link(rel="preconnect", href="https://fonts.gstatic.com"),
+    html.Link(rel="stylesheet", href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap"),
+    html.Div(style={"font-family": 'Open Sans', 'background': '#'}, children=[
         #1- Bar
         html.Div([
             html.H1(children="Sentiments of the Tweets today"),
@@ -199,7 +202,7 @@ def create_dash_application(flask_app):
                             },))
 
         ])
-        ])
+        ])])
 
 
     return dash_app
