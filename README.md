@@ -7,20 +7,26 @@ Social Care is a Python Based plug and play sentiment analysis project.
 3. Among Social Groups, it can help check sentiment pattern of a member and check if they need attention.
 
 # Visualizations 
-![img_2.png](Images/img_2.png)
+![img_2.png](Images/positive_tweets.png)
 
-![img_3.png](Images/img_3.png)
+![img_3.png](Images/overall_tweets.png)
+
+![img.png](Images/wordcloud_overall.png)
+
+![img_1.png](Images/Heatmap.png)
 
 # Architectural Diagram
 
 ![img_3.png](Images/Architecture Diagram.png)
 # Data Flow Diagram
 
-![img_1.png](Images/img_1.png)
+![img_1.png](Images/DFD.png)
+
+
 
 # Process
 
-![img.png](Images/img.png)
+![img.png](Images/process.png)
 
 # Potential use cases
 
@@ -55,5 +61,5 @@ References
 18. WordCloud - https://www.kaggle.com/jagangupta/wordcloud-of-tweets
 19. Dash in Flask - https://github.com/okomarov/dash_on_flask
 
-Front-end
-20. Adding background images - https://www.youtube.com/watch?v=33IinMVJf-M
+
+20.Front-end- Adding background images - https://www.youtube.com/watch?v=33IinMVJf-M
