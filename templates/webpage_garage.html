@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Social Care</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+}
+
+/* Style the header */
+.header {
+  padding: 80px;
+  text-align: center;
+  background-image: url(images/clarity.png);
+  color: black;
+}
+
+/* Increase the font size of the h1 element */
+.header h1 {
+  font-size: 40px;
+}
+
+/* Style the top navigation bar */
+.navbar {
+  overflow: hidden;
+  background-color: #333;
+}
+
+/* Style the navigation bar links */
+.navbar a {
+  float: left;
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 20px;
+  text-decoration: none;
+}
+
+/* Right-aligned link */
+.navbar a.right {
+  float: right;
+}
+
+/* Change color on hover */
+.navbar a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+/* Column container */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* Create two unequal columns that sits next to each other */
+/* Sidebar/left column */
+.side {
+  flex: 30%;
+  background-color: #f1f1f1;
+  padding: 20px;
+}
+
+/* Main column */
+.main {
+  flex: 70%;
+  background-color: white;
+  padding: 20px;
+}
+
+/* Fake image, just for this example */
+.fakeimg {
+  background-color: #aaa;
+  width: 100%;
+  padding: 20px;
+}
+
+/* Footer */
+.footer {
+  padding: 20px;
+  text-align: center;
+  background: #ddd;
+}
+
+/* Responsive layout - when the screen is less than 700px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 700px) {
+  .row {
+    flex-direction: column;
+  }
+}
+
+/* Responsive layout - when the screen is less than 400px wide, make the navigation links stack on top of each other instead of next to each other */
+@media screen and (max-width: 400px) {
+  .navbar a {
+    float: none;
+    width:100%;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Social Care</h1>
+  <p>Actionable social media insight.</p>
+</div>
+
+<div class="navbar">
+  <a href="/">Home</a>
+  <a href="/dash">Dashboard</a>
+  <a href="/notify">Notify</a>
+  <a href="/Blog">Blog</a>
+  <a href="/get_members">Available Members</a>
+  <a href="/connector" class="right">Connector</a>
+</div>
+
+<div class="row">
+  <div class="side">
+    <h2>About Expert AI</h2>
+    <h5>APIs:</h5>
+    <div class="expertai.png" style="height:200px;">ExpertAI</div>
+    <p>Here,we are using ExpertAI API on Tweets for Sentiment Analysis, Key Phrase Extraction and Named Entity Recognition.</p>
+    <h3>More Use Cases</h3>
+    <p>Various Use Cases are-</p>
+    <div class="fakeimg" style="height:60px;">Image</div><br>
+    <div class="fakeimg" style="height:60px;">Image</div><br>
+    <div class="fakeimg" style="height:60px;">Image</div>
+  </div>
+  <div class="main">
+    <h2>From Social Distance to Social Care</h2>
+    <h5>June 16,2021</h5>
+    <div class="fakeimg" style="height:200px;">Image</div>
+    <p>SocialCare</p>
+    <p>The idea behind SocialCare is to utilize social Media to check on friends and colleagues if they feel negative.Twitter being a medium of intellectual discussion and small sentences, picking up sentiment of even socially less active twitter members get easy.
+        SocialCare utilizes tweets and applies sentimental Analysis on the tweet.Taking the pattern of last few tweets, it can give a good idea if feelings if many tweets are negative in a row.</p>
+    <br>
+    <h2>Who must utilize its potential? </h2>
+    <h5>June 16, 2021</h5>
+    <div class="fakeimg" style="height:200px;">Image</div>
+    <p>Companies to Support their Employees</p>
+    <p>Understanding how employees are facing any issue have got difficult during this large scale Work from Home Experiment.
+    It has a good side with people able to attend and enjoy with their families.
+    However,many people are also facing lonelyness and depression.If we are able to determine these issues before they become persistant, it can be very helpful.
+    The Dashboard of SocialCare can be used to glance on tweets by employees, their sentiments, words used as well as weightage of words in the tweet. For this we are using visualizations using plotly with the help of Expert.ai API.</p>
+  </div>
+</div>
+
+<div class="footer">
+  <h2>Copyright &#169; Tech Shuttle</h2>
+  <h3>Visit <a href="https://www.github.com" id="Tech Shuttle">Tech Shuttle</a></h3>
+</div>
+
+</body>
+</html>

@@ -1,27 +1,24 @@
+import os
+# from tweepy import API,Cursor,OAuthHandler,Stream
 import tweepy
 import config
 import pandas as pd
 import sys
 import numpy as np
-import re
-from nltk.stem import WordNetLemmatizer
+# import re
 import time
+from datetime import datetime,timedelta
+# start_time = datetime.now()
 
-from expertai.nlapi.cloud.client import ExpertAiClient
-client = ExpertAiClient()
-
-# from dotenv import load_dotenv
-# load_dotenv()
-
-import os
-os.environ["EAI_USERNAME"] = config.expertai_mail
-os.environ["EAI_PASSWORD"] =config.expertai_password
-
+from src.expertai_utils import sentiment
+from src.expertai_utils import resource_concept_score_analysis as rcsa
+from src.text_preprocess import preprocess
 
 
 """authentication function"""
 
 def twitter_api():
+    """to utilize twitter api using the key and token from twitter developer account"""
     try:
         consumer_key = config.consumer_key
         consumer_secret = config.consumer_secret
@@ -36,46 +33,42 @@ def twitter_api():
     api = tweepy.API(auth,wait_on_rate_limit= True)
     return api
 
-def sentiment(text):
-    """returns overall sentiment"""
-    output = client.specific_resource_analysis(body = {"document":{"text": text}},
-                                               params = {'language': 'en','resource': 'sentiment'})
-    return output.sentiment.overall
 
-# Cleaning the tweets
-def preprocess(tweet):
-    # remove links
-    tweet = re.sub(r'http\S+', '', tweet)
-    # remove mentions
-    tweet = re.sub("@\w+", "", tweet)
-    # alphanumeric and hashtags
-    tweet = re.sub("[^a-zA-Z#]", " ", tweet)
-    # remove multiple spaces
-    tweet = re.sub("\s+", " ", tweet)
-    tweet = tweet.lower()
-    # Lemmatize
-    lemmatizer = WordNetLemmatizer()
-    sent = ' '.join([lemmatizer.lemmatize(w) for w in tweet.split() if len(lemmatizer.lemmatize(w)) > 3])
-
-    return sent
+def user_tweet_today(username):
+    """to extract the latest tweet from a user timeline"""
+    tweets = tweepy.Cursor(api.user_timeline, id=username, tweet_mode='extended').items(1)
+    tweet = [[preprocess(tweet.full_text) if tweet.created_at > datetime.now()- timedelta(days=7) else 0] for tweet in tweets]
+    return tweet[0][0]
 
 
-def tweet_user(username,max_tweets):
-    """Extracting user information"""
-    # Creation of query method using parameters
-    tweets = tweepy.Cursor(api.user_timeline,id=username,tweet_mode = 'extended').items(max_tweets)
-
-    tweets_list = [sentiment(preprocess(tweet.full_text)) for tweet in tweets]
+def tweet_user_updated(username,max_tweets):
+    """returns latest tweets( not older than yesterday) or tweet pattern for no. of tweets given in max_tweets"""
+    start = time.time()
+    tweets = tweepy.Cursor(api.user_timeline, id=username, tweet_mode='extended').items(max_tweets)
     if max_tweets == 1:
-        for tweet in tweets_list:
-            return float(tweet)
+        tweet = [[sentiment(preprocess(tweet.full_text)) if tweet.created_at > datetime.now() - timedelta(days= 7) else 0] for tweet in tweets]
+        end = time.time()
+        # print("for 1 tweet", end - start)
+        return float(tweet[0][0])
     if max_tweets > 1:
-        sentiment_pattern = [0 if tweet < 0 else 1 for tweet in tweets_list]
+        #returns tweet pattern upto last 4 months
+        tweets_list = [sentiment(preprocess(tweet.full_text)) for tweet in tweets]
+        sentiment_pattern = [-1 if tweet < 0 else 1 for tweet in tweets_list]
+        end = time.time()
+        print(f"for {max_tweets} tweets: ",end - start)
         return str(sentiment_pattern)
 
 
+
+def tweet_user_RCSA(username,max_tweets):
+    """Resource Concept Score Analysis """
+    tweets = tweepy.Cursor(api.user_timeline, id=username, tweet_mode='extended').items(max_tweets)
+    if max_tweets == 1:
+        tweet = [
+            [rcsa(preprocess(tweet.full_text)) if tweet.created_at > datetime.now() - timedelta(
+                days=7) else 0] for
+            tweet in tweets]
+    return tweet[0][0]
+
 api = twitter_api()
 
-# if __name__ == '__main__':
-#     a = tweet_user("@rajatpaliwal319", 1)
-#     print(a)
