@@ -1,14 +1,7 @@
-import datetime
-import logging
 import logging.config
-import os
-import smtplib
-import psycopg2
-import config
-import simplejson as json
+from flasgger import Swagger, swag_from
 
-from flask import Flask, request, jsonify,render_template, redirect
-from flask.helpers import url_for
+from flask import Flask, request, jsonify, render_template
 
 from src import twitter_utils
 from src import db_utils as db
@@ -17,10 +10,10 @@ from pretty_html_table import build_table
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from src.dashboard import create_dash_application
-# from src.dashboard_garage import create_dash_application
+
 
 #Scheduler
-sched = BackgroundScheduler(daemon =True)
+sched = BackgroundScheduler(daemon=True)
 sched.start()
 
 #Logger
@@ -36,66 +29,22 @@ logger.addHandler(stream_handler)
 
 
 app = Flask(__name__)
-
+swagger = Swagger(app)
 
 create_dash_application(app)
+
 
 @app.route("/", methods=['GET'])
 def get_homepage():
     logger.info("homepage successful")
-    return render_template("webpage_garage.html")
+    return render_template("webpage_garage.html",
+                           filename="static/work_from_home.jpg", organization="static/organization.jpg",
+                           logo="static/logo.jpg", techshuttle="static/Spaceship.jpg"
+                           )
 
 
-@app.route("/get_urls", methods=['GET'])
-def get_urls():
-    data = request.get_json()
-    result = {"result": []}
-    twitter_id = data["twitter_id"]
-    list_urls = db.get_url(twitter_id=twitter_id)
-    for id, twitter in list_urls:
-        result["result"].append({"id": id, "twitter": twitter})
-    logger.info(f"{result} is updated for get_urls")
-    return jsonify(result=result)
-
-
-@app.route("/add_sentiment", methods=[ "GET"])
-def add_sentiment():
-    list_sentiments = db.update_tweet_sentiment_from_ids()
-    logger.info(f"status of sentiments {list_sentiments}")
-    if list_sentiments[0] == 1:
-        result = {"status": "success"}
-        logger.info("added sentiment successfully")
-    else:
-        result = {"status": "failure"}
-        logger.info("failed to add sentiments")
-    return jsonify(result)
-
-@app.route("/add_sentiment_pattern", methods = ["GET"])
-def add_sentiment_pattern():
-    list_pattern = db.update_twitter_sentiment_pattern_from_ids()
-    logger.info(f"{add_sentiment_pattern} is working")
-    if list_pattern[0] == 1:
-        result = {"status": "success"}
-        logger.info("added sentiment pattern successfully")
-    else:
-        result = {"status": "failure"}
-        logger.info("failed to add sentiment pattern")
-    return jsonify(result)
-
-@app.route("/add_rcsa", methods = ["GET"])
-def add_rcsa():
-    list_rcsa = db.update_tweet_RCSA_from_ids()
-    logger.info(f"{add_sentiment_pattern} is working")
-    if list_rcsa[0] == 1:
-        result = {"status": "success"}
-        logger.info("added rcsa successfully")
-    else:
-        result = {"status": "failure"}
-        logger.info("failed to add rcsa")
-    return jsonify(result)
-
-
-@app.route("/add_members", methods=['POST'])
+@app.route("/add_members", methods=['GET'])
+@swag_from('api_desc/add_members.yml')
 def add_members():
     data = request.get_json()
     result = []
@@ -114,10 +63,20 @@ def add_members():
     return jsonify(result)
 
 
+@app.route("/get_urls", methods=['GET'])
+@swag_from('api_desc/get_urls.yml')
+def get_urls():
+    result = {"result": []}
+    list_urls = db.get_url_info()
+    for twitter_id,tweet in list_urls:
+        result["result"].append({"twitter_id": twitter_id,"tweet":tweet})
+    logger.info(f"{result} is updated for get_urls")
+    return jsonify(result=result)
+
+
 @app.route("/get_members", methods=['GET'])
 def get_members():
     try:
-        # list_members= db.read_record(twitter_id= None)
         list_members = db.read_records()
         logger.info(f'{list_members} are shown from Employee table')
     except Exception as e:
@@ -126,16 +85,52 @@ def get_members():
     return "success"
 
 
-@app.route("/remove_member", methods = ["GET"])
-def remove_member():
-    data = request.get_json()
-    twitter_id = data["twitter_id"]
-    try:
-        remove_employee = db.delete_records(twitter_id)
-        logger.info(f"member with twitter id {twitter_id} removed")
-    except Exception as e:
-        logger.error(f"{e}")
-    return jsonify({"status":"success"})
+@app.route("/add_tweet", methods=[ "GET"])
+def add_tweet():
+    list_tweet = db.update_tweet_from_ids()
+    logger.info(f"status of sentiments {list_tweet}")
+    if list_tweet[0] == 1:
+        result = {"status": "success"}
+        logger.info("added sentiment successfully")
+    else:
+        result = {"status": "failure"}
+        logger.info("failed to add sentiments")
+    return jsonify(result)
+
+
+@app.route("/tweet_analytics", methods = ["GET"])
+def add_tweet_analytics():
+    list_sentiment_rcsa = db.tweet_analytics()
+    logger.info(f"status of sentiments {list_sentiment_rcsa}")
+    if list_sentiment_rcsa == 1:
+        result = {"status": "success"}
+        logger.info("added sentiment and RCSA")
+    else:
+        result = {"status": "failure"}
+        logger.info("failed to add sentiments or RCSA")
+    return jsonify(result)
+
+@app.route("/add_sentiment_pattern", methods=["GET"])
+@swag_from('api_desc/add_sentiment_pattern.yml')
+def add_sentiment_pattern():
+    list_pattern = db.update_twitter_sentiment_pattern_from_ids()
+    logger.info(f"{add_sentiment_pattern} is working")
+    if list_pattern[0] == 1:
+        result = {"status": "success"}
+        logger.info("added sentiment pattern successfully")
+    else:
+        result = {"status": "failure"}
+        logger.info("failed to add sentiment pattern")
+    return jsonify(result)
+
+
+@app.route("/update_database_to_df", methods = ["GET"])
+def update_database_to_df():
+    update = db.read_data_to_dataframe()
+    if update.shape[1] == 7:
+        return jsonify({"result":"success"})
+    else:
+        return jsonify({"result":"DataFrame not updated"})
 
 
 @app.route("/notify", methods=["GET"])
@@ -151,32 +146,21 @@ def notify():
     except Exception as error:
         logger.error(f"{error}")
 
-    return "Mail sent successfully."
+    return render_template("Notification.html", filename='static/Golden_Gate.png')
 
 
-@app.route("/get_member_sentiment", methods = ["GET"])
-def get_member_sentiment():
+@app.route("/remove_member", methods = ["GET"])
+def remove_member():
     data = request.get_json()
-    result = {"result": []}
     twitter_id = data["twitter_id"]
-    employee_info = db.get_twitter_sentiment_pattern_of_employee(twitter_id,max_tweets = 15)
-    for id, name, sentiment,sentiment_pattern in employee_info:
-        result["result"].append({"id": id, "name": name, "sentiment": sentiment, "sentiment_pattern":sentiment_pattern})
-    logger.info(f"{result} is updated for get_user_sentiment")
-    return jsonify(result=result)
-
-
-### Temperory provision###############################Check alternative
-@app.route("/update_database_to_df", methods = ["GET"])
-def update_database_to_df():
-    update = db.read_data_to_dataframe()
-    if update.shape[1] == 7:
-        return jsonify({"result":"success"})
-    else:
-        return jsonify({"result":"DataFrame not updated"})
-
+    try:
+        remove_employee = db.delete_records(twitter_id)
+        logger.info(f"member with twitter id {twitter_id} removed")
+    except Exception as e:
+        logger.error(f"{e}")
+    return jsonify({"status": "success"})
 
 
 if __name__ == "__main__":
     logging.info('App started and is running successfully')
-    app.run(debug = True)
+    app.run(debug=True)

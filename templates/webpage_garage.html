@@ -4,7 +4,12 @@
 <title>Social Care</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 <style>
+* {
+  font-family: 'Open Sans', sans-serif;
+}
 * {
   box-sizing: border-box;
 }
@@ -18,7 +23,8 @@ body {
 .header {
   padding: 80px;
   text-align: center;
-  background-image: url(images/clarity.png);
+  background-image: url({{logo}});
+  background-repeat: no-repeat;
   color: black;
 }
 
@@ -80,6 +86,15 @@ body {
   background-color: #aaa;
   width: 100%;
   padding: 20px;
+  background-image: url({{filename}})
+}
+
+/* Fake image, just for this example */
+.orgimg {
+  background-color: #aaa;
+  width: 100%;
+  padding: 20px;
+  background-image: url({{organization}})
 }
 
 /* Footer */
@@ -108,8 +123,8 @@ body {
 <body>
 
 <div class="header">
-  <h1>Social Care</h1>
-  <p>Actionable social media insight.</p>
+  <h1>&nbsp</h1>
+  <p></p>
 </div>
 
 <div class="navbar">
@@ -125,13 +140,14 @@ body {
   <div class="side">
     <h2>About Expert AI</h2>
     <h5>APIs:</h5>
-    <div class="expertai.png" style="height:200px;">ExpertAI</div>
+    <div><img src="https://www.expert.ai/wp-content/uploads/2020/09/footer-logo-new.png"></div>
     <p>Here,we are using ExpertAI API on Tweets for Sentiment Analysis, Key Phrase Extraction and Named Entity Recognition.</p>
-    <h3>More Use Cases</h3>
+    <!---<h3>More Use Cases</h3>
     <p>Various Use Cases are-</p>
     <div class="fakeimg" style="height:60px;">Image</div><br>
     <div class="fakeimg" style="height:60px;">Image</div><br>
     <div class="fakeimg" style="height:60px;">Image</div>
+    -->
   </div>
   <div class="main">
     <h2>From Social Distance to Social Care</h2>
@@ -143,7 +159,7 @@ body {
     <br>
     <h2>Who must utilize its potential? </h2>
     <h5>June 16, 2021</h5>
-    <div class="fakeimg" style="height:200px;">Image</div>
+    <div class="orgimg" style="height:200px;"></div>
     <p>Companies to Support their Employees</p>
     <p>Understanding how employees are facing any issue have got difficult during this large scale Work from Home Experiment.
     It has a good side with people able to attend and enjoy with their families.
@@ -155,6 +171,7 @@ body {
 <div class="footer">
   <h2>Copyright &#169; Tech Shuttle</h2>
   <h3>Visit <a href="https://www.github.com" id="Tech Shuttle">Tech Shuttle</a></h3>
+  <img src={{techshutlle}}>
 </div>
 
 </body>

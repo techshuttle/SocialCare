@@ -1,26 +1,50 @@
-# SocialCare
+# Motivation for  SocialCare
 
-Social Care is a Python Based plug and play sentiment analysis project.
-# Use Case
-1. Social Care can be used by HRs to analyze sentiments of their employees based on their social media accounts.
-2. It can also be used to check on Hate Speeches in twitter.
-3. Among Social Groups, it can help check sentiment pattern of a member and check if they need attention.
+The World has become a large scale work from home experiment since covid-19 outbreak in 2020.With this,many of us are able to enjoy 
+company of their families. However, there are also many facing emotional challanges, at times leading to mental breakdown or more.
+A work place provides one with communication, processes and culture related to work. Retaining it working from home can be really difficult. 
+Therefore,a step towards improving attention towards employees to support them,not when they ask or its late, but when a pattern of negativie emotions
+emerges can be useful. Prevention is better than cure.
+
+# What Social Care is about?
+SocialCare analyzing linguistic markers in social media posts of employees.The insights of this analysis can be benificial to 
+understand hidden sentiment in the post.With this analysis on last few posts of the user,hidden negative sentiments if any,can be checked.
+With use of Database, this application can be scaled to attend to even 1000s of employees or members.
+
+# How we do it?
+Lets understand this with the diagrams below.
+
+#What impact it can have?
+It is developed as a support system of communication between HRs and Employees. It can b connect to the HR database easily using a connector.
+Improved understanding of Employee's problem can help better communication, rapport and efficiencies when Working from Home.
+
+# Other Use Case
+
+1. It can also be used to check on Hate Speeches in twitter.
+2. Among Social Groups, it can help check sentiment pattern of a member and check if they need attention.
+3. It can be used for review analysis in real time.
 
 # Visualizations 
-![img_2.png](Images/img_2.png)
+![img_2.png](Images/positive_tweets.png)
 
-![img_3.png](Images/img_3.png)
+![img_3.png](Images/overall_tweets.png)
+
+![img.png](Images/wordcloud_overall.png)
+
+![img_1.png](Images/Heatmap.png)
 
 # Architectural Diagram
 
-![Architecture Diagram.PNG](Images/Architecture Diagram.PNG)
+![img_3.png](Images/Architectural Diagram.png)
 # Data Flow Diagram
 
-![img_1.png](Images/img_1.png)
+![img_1.png](Images/DFD.png)
+
+
 
 # Process
 
-![img.png](Images/img.png)
+![img.png](Images/process.png)
 
 # Potential use cases
 
@@ -55,6 +79,10 @@ References
 18. WordCloud - https://www.kaggle.com/jagangupta/wordcloud-of-tweets
 19. Dash in Flask - https://github.com/okomarov/dash_on_flask
 
-Front-end
-20. Adding background images - https://www.youtube.com/watch?v=33IinMVJf-M
-=======
+20.Front-end- Adding background images - https://www.youtube.com/watch?v=33IinMVJf-M
+
+
+###### Attributions
+1. Photo by <a href="https://unsplash.com/@jupp?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Jonathan Kemper</a> on <a href="https://unsplash.com/s/photos/work-from-home?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+2. Photo by <a href="https://unsplash.com/@austindistel?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Austin Distel</a> on <a href="https://unsplash.com/s/photos/organization?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+  
