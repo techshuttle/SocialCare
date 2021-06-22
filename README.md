@@ -35,7 +35,7 @@ Improved understanding of Employee's problem can help better communication, rapp
 
 # Architectural Diagram
 
-![img_3.png](Images/Architecture Diagram.png)
+![img_3.png](Images/Architectural Diagram.png)
 # Data Flow Diagram
 
 ![img_1.png](Images/DFD.png)

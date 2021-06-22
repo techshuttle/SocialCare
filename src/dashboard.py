@@ -10,6 +10,7 @@ from src.plt_wordcloud import wordcloud_by_tweets
 from src.db_utils import read_name_sentiment_add_pattern
 df = read_name_sentiment_add_pattern()
 
+
 STOPWORDS = ["https", "co", "RT","S","LA","T","ALWAYS"] + list(STOPWORDS)
 
 #dividing data based on positive and negative sentiments

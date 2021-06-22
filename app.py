@@ -1,11 +1,7 @@
 import datetime
 import logging
 import logging.config
-import os
-import smtplib
-import psycopg2
-import config
-import simplejson as json
+from flasgger import Swagger, swag_from
 
 from flask import Flask, request, jsonify,render_template, redirect
 
@@ -46,7 +42,7 @@ def get_homepage():
     return render_template("webpage_garage.html")
 
 
-@app.route("/add_members", methods=['POST'])
+@app.route("/add_members", methods=['GET'])
 def add_members():
     data = request.get_json()
     result = []
