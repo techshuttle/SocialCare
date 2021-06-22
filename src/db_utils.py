@@ -4,6 +4,7 @@ import psycopg2
 from typing import Dict, List
 import pandas as pd
 import psycopg2.extras
+
 # from configparser import ConfigParser
 from src.twitter_utils import tweet_user_updated,user_tweet_today
 from src.expertai_utils import sentiment
@@ -85,14 +86,13 @@ def create_table():
 
 def insert_data(id,name,twitter_id):
 
-    twitter_sentiment = tweet_user_updated(twitter_id,max_tweets= 1)
-
     conn.autocommit = True
     try:
         cursor.execute("INSERT INTO Employee(id,name,twitter_id) VALUES (%s,%s,%s)",(id,name,twitter_id))
     except Exception as e:
-        return 0
+        print(f"{e}")
         logger.error(f"{e}- needs to be corrected")
+        return 0
     return 1
 
 
@@ -111,7 +111,7 @@ def get_url_info(twitter_id = None):
     """reading the social media ids from the table"""
     try:
         res = cursor.execute("SELECT twitter_id,tweet FROM Employee ")
-        urls = cursor.fetchmany(5)
+        urls = cursor.fetchall()
         logger.info("all urls fetched")
         conn.commit()
         return urls
@@ -134,8 +134,6 @@ def update_tweet(twitter_id):
         return print(error)
     return 1
 
-
-# print(update_tweet("@realDonaldTrump"))
 
 def update_tweet_from_ids():
     """updating and checking the update tweets for all twitter ids"""
@@ -165,7 +163,6 @@ def get_twitter_sentiment_pattern(twitter_id):
         return 0
     return 1
 
-# print(get_twitter_sentiment_pattern_from_ids("@danieltosh"))
 
 def update_twitter_sentiment_pattern_from_ids():
     """updating and checking the update of twitter sentiment for the user"""
@@ -209,16 +206,15 @@ def read_data_to_dataframe():
     return df
 
 
-
 def read_name_sentiment_add_pattern():
     """Reading id, name and sentiment of employee from the table"""
     df = read_data_to_dataframe()
     df = df[["id","name","tweet","tweet_sentiment", "twitter_sentiment_pattern","rcsa"]]
     logger.info(f"The {read_name_sentiment_add_pattern} is running")
-    df[['tweet']].fillna("no tweet")
+    df = df.fillna(axis=0, method='ffill')
+    # df['tweet'].fillna("no tweet today")
+
     return df
-
-
 
 
 ###############################################---DELETE---#############################################################
@@ -277,8 +273,6 @@ def get_twitter_sentiment_pattern_of_employee(twitter_id,max_tweets):
         return employee
     except Exception as e:
         return e
-
-# print(get_twitter_sentiment_pattern_of_employee("@PMOIndia",max_tweets = 20))
 
 
 #Inserting data using dataframe

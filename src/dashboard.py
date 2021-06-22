@@ -10,38 +10,35 @@ from src.plt_wordcloud import wordcloud_by_tweets
 from src.db_utils import read_name_sentiment_add_pattern
 df = read_name_sentiment_add_pattern()
 
-STOPWORDS = ["https", "co", "RT","S","LA","T","ALWAYS"] + list(STOPWORDS)
+STOPWORDS = ["https", "co", "RT", "S", "LA", "T", "ALWAYS"] + list(STOPWORDS)
 
 #dividing data based on positive and negative sentiments
-sentiment_selection_negative = (-40,-0.1)
-sentiment_selection_positive = (0.1,50)
+sentiment_selection_negative = (-40, -0.1)
+sentiment_selection_positive = (0.1, 50)
 mask_positive = df["tweet_sentiment"].between(*sentiment_selection_positive)
 mask_negative = df["tweet_sentiment"].between(*sentiment_selection_negative)
 df_attend_negative = df[mask_negative]
 df_attend_positive = df[mask_positive]
 
-import matplotlib.pyplot as plt
 #wordcloud
-word_cloud_overall = wordcloud_by_tweets(df['tweet'],"Sentiment")
-word_cloud_positive = wordcloud_by_tweets(df_attend_positive['tweet'],"Positive")
-word_cloud_negative = wordcloud_by_tweets(df_attend_negative['tweet'],"Positive")
+word_cloud_overall = wordcloud_by_tweets(df['tweet'], "Sentiment")
+word_cloud_positive = wordcloud_by_tweets(df_attend_positive['tweet'], "Positive")
+word_cloud_negative = wordcloud_by_tweets(df_attend_negative['tweet'], "Positive")
 
 #Heatmap
 employees = df['name'].iloc[:10].to_list()
-tweet = ["Latest Tweet",2,3,4,5,6,7,8,9,"10th"]
+tweet = ["Latest Tweet", 2, 3, 4, 5, 6, 7, 8, 9, "10th"]
 data_heatmap = df['twitter_sentiment_pattern'].iloc[:10].apply(eval).to_list()
 
-fig_heatmap = px.imshow(data_heatmap,
-                color_continuous_scale=px.colors.sequential.Emrld,
-                title = "10 tweet sentiment pattern",
-                labels = dict(x = "Tweet index", y = "Names"),
-                x= ["1","2","3","4","5","6","7","8","9","10"],
-                y = employees)
-fig_heatmap.update_xaxes(side= "top")
+fig_heatmap = px.imshow(data_heatmap, color_continuous_scale=px.colors.sequential.Emrld,
+                        title="10 tweet sentiment pattern",
+                        labels=dict(x="Tweet index", y="Names"),
+                        x=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"], y=employees)
+fig_heatmap.update_xaxes(side="top")
 
 #size control of heatmap
-fig_heatmap.layout.height = 1200
-fig_heatmap.layout.width = 1200
+fig_heatmap.layout.height = 800
+fig_heatmap.layout.width = 800
 
 #for pie chart
 try:
@@ -69,9 +66,6 @@ fig_bar = px.bar(
 #Bar graph for negative tweets
 # Filter by Sentiment
 
-
-# print(df[mask].columns)
-#
 bar_negative = px.bar(df_attend_negative[['name','tweet_sentiment']],
                    x = 'name',
                    y = 'tweet_sentiment',
@@ -80,16 +74,12 @@ bar_negative = px.bar(df_attend_negative[['name','tweet_sentiment']],
                    template= 'plotly_white'
                    )
 
-bar_positive = px.bar(df_attend_positive[['name','tweet_sentiment']],
-                   x = 'name',
-                   y = 'tweet_sentiment',
-                   text = 'tweet_sentiment',
-                   color_discrete_sequence= ['#F63366']*len(df_attend_positive),
-                   template= 'plotly_white'
-                   )
+bar_positive = px.bar(df_attend_positive[['name', 'tweet_sentiment']], x='name', y='tweet_sentiment',
+                      text='tweet_sentiment', color_discrete_sequence=['#F63366']*len(df_attend_positive),
+                      template='plotly_white')
 
 # df_chart_summary
-df_tweets_summary = df[["id","name","tweet_sentiment","rcsa","tweet"]]
+df_tweets_summary = df[["name", "tweet_sentiment", "rcsa", "tweet"]]
 
 
 app = dash.Dash(__name__)
@@ -135,7 +125,10 @@ def create_dash_application(flask_app):
             html.H1(children="Significant words used in the Overall Tweets"),
             html.Div(
                 children=[html.Img(src="data:image/png;base64," + word_cloud_overall,
-                                   style={'height': '50%', 'width': '50%'})])
+                                   style={
+                                       'height': '50%', 'width': '50%', 'display': 'block',
+                                       'margin-left': 'auto', 'margin-right': 'auto'
+                                   })])
         ]),
         #4. Heatmap
         html.Div([
@@ -167,14 +160,17 @@ def create_dash_application(flask_app):
             html.H1(children="Words people use for their Tweets being positive"),
             html.Div(
                 children=[html.Img(src="data:image/png;base64," + word_cloud_positive,
-                                   style={'height': '50%', 'width': '50%'})])
+                                   style={
+                                       'height': '50%', 'width': '50%', 'display': 'block',
+                                       'margin-left': 'auto', 'margin-right': 'auto'
+                                   })])
         ]),
         # 7.Negative Tweets
         html.Div([
             html.H1(children="Negative Tweet Sentiment"),
 
             html.Div(children="""
-                It tells us who don't feel much good today about somthing.
+                It tells us who don't feel much good today about something.
                 """),
 
             dcc.Graph(
@@ -184,22 +180,26 @@ def create_dash_application(flask_app):
         ]),
         # 8. Negative WordCloud
         html.Div([
-            html.H1(children="Words people express to show their negative sentiment about somthing."),
+            html.H1(children="Words people express to show their negative sentiment about something."),
             html.Div(
-                children=[html.Img(src="data:image/png;base64," + word_cloud_negative, style={'height': '50%', 'width': '50%'})])
+                children=[html.Img(src="data:image/png;base64," + word_cloud_negative,
+                                   style={
+                                       'height': '50%', 'width': '50%', 'display': 'block',
+                                       'margin-left': 'auto', 'margin-right': 'auto'
+                                   })])
         ]),
         html.Div([
             html.H1(children="OverAll Summary of Tweets"),
-            html.Div(children=
-                        dash_table.DataTable(
-                            id='table',
-                            columns=[{"name":i,"id":i} for i in df_tweets_summary.columns],
-                            data=df_tweets_summary.to_dict('records'),
-                            style_header={'backgroundColor': 'rgb(30, 30, 30)'},
-                            style_cell={
-                            'backgroundColor': 'rgb(50, 50, 50)',
-                            'color': 'white'
-                            },))
+            html.Div(children=dash_table.DataTable(
+                id='table',
+                columns=[{"name": i, "id": i} for i in df_tweets_summary.columns],
+                data=df_tweets_summary.to_dict('records'),
+                style_header={'backgroundColor': 'rgb(30, 30, 30)'},
+                style_cell={
+                    'whiteSpace': 'normal',
+                    'backgroundColor': 'rgb(50, 50, 50)',
+                    'color': 'white'
+                },))
 
         ])
         ])])

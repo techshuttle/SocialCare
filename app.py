@@ -43,7 +43,7 @@ def get_homepage():
                            )
 
 
-@app.route("/add_members", methods=['POST'])
+@app.route("/add_members", methods=['GET'])
 @swag_from('api_desc/add_members.yml')
 def add_members():
     data = request.get_json()

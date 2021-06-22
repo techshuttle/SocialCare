@@ -25,13 +25,17 @@ Improved understanding of Employee's problem can help better communication, rapp
 3. It can be used for review analysis in real time.
 
 # Visualizations 
-![img_2.png](Images/img_2.png)
+![img_2.png](Images/positive_tweets.png)
 
-![img_3.png](Images/img_3.png)
+![img_3.png](Images/overall_tweets.png)
+
+![img.png](Images/wordcloud_overall.png)
+
+![img_1.png](Images/Heatmap.png)
 
 # Architectural Diagram
 
-![img_3.png](Images/Architecture Diagram.png)
+![img_3.png](Images/Architectural Diagram.png)
 # Data Flow Diagram
 
 ![img_1.png](Images/DFD.png)
@@ -75,9 +79,8 @@ References
 18. WordCloud - https://www.kaggle.com/jagangupta/wordcloud-of-tweets
 19. Dash in Flask - https://github.com/okomarov/dash_on_flask
 
-Front-end
-20. Adding background images - https://www.youtube.com/watch?v=33IinMVJf-M
-=======
+20.Front-end- Adding background images - https://www.youtube.com/watch?v=33IinMVJf-M
+
 
 ###### Attributions
 1. Photo by <a href="https://unsplash.com/@jupp?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Jonathan Kemper</a> on <a href="https://unsplash.com/s/photos/work-from-home?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
