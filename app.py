@@ -1,7 +1,7 @@
-import datetime
-import logging
+
 import logging.config
-from flasgger import Swagger, swag_from
+# from flasgger import Swagger, swag_from
+# from flasgger import LazyString, LazyJSONEncoder
 
 from flask import Flask, request, jsonify,render_template, redirect
 
@@ -31,18 +31,47 @@ logger.addHandler(stream_handler)
 
 
 app = Flask(__name__)
-
+# swagger = Swagger(app)
 
 create_dash_application(app)
+
+# swagger_config = {
+#     "headers": [],
+#     "specs": [
+#         {
+#             "endpoint": "apispec_1",
+#             "route": "/apispec_1.json",
+#             "rule_filter": lambda rule: True,  # all in
+#             "model_filter": lambda tag: True,  # all in
+#         }
+#     ],
+#     "static_url_path": "/flasgger_static",
+#     # "static_folder": "static",  # must be set by user
+#     "swagger_ui": True,
+#     "specs_route": "/swagger/",
+# }
+#
+# template = dict(
+#     swaggerUiPrefix=LazyString(lambda: request.environ.get("HTTP_X_SCRIPT_NAME", ""))
+# )
+#
+# app.json_encoder = LazyJSONEncoder
+# swagger = Swagger(app, config=swagger_config, template=template)
+
+
 
 @app.route("/", methods=['GET'])
 def get_homepage():
     """opens homepage"""
     logger.info("homepage successful")
-    return render_template("webpage_garage.html")
+    return render_template("webpage_garage.html",
+                           filename="static/work_from_home.jpg", organization="static/organization.png",
+                           logo="static/logo.png", techshuttle="static/Spaceship.png"
+                           )
 
 
 @app.route("/add_members", methods=['GET'])
+# @swag_from('api_desc/add_members.yml')
 def add_members():
     data = request.get_json()
     result = []
@@ -94,6 +123,7 @@ def add_tweet():
         logger.info("failed to add sentiments")
     return jsonify(result)
 
+
 @app.route("/tweet_analytics", methods = ["GET"])
 def add_tweet_analytics():
     list_sentiment_rcsa = db.tweet_analytics()
@@ -108,6 +138,7 @@ def add_tweet_analytics():
 
 
 @app.route("/add_sentiment_pattern", methods = ["GET"])
+# @swag_from('api_desc/add_sentiment_pattern.yml')
 def add_sentiment_pattern():
     list_pattern = db.update_twitter_sentiment_pattern_from_ids()
     logger.info(f"{add_sentiment_pattern} is working")
@@ -142,7 +173,7 @@ def notify():
     except Exception as error:
         logger.error(f"{error}")
 
-    return "Mail sent successfully."
+    return render_template("Notification.html", filename='static/Golden_Gate.png')
 
 
 @app.route("/remove_member", methods = ["GET"])

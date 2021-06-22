@@ -1,0 +1,7 @@
+Update sentiment history of users
+This API will execute for each user and hence takes large time to return
+---
+
+responses:
+  200:
+    description: Return status success or failure

@@ -4,11 +4,12 @@ import psycopg2
 from typing import Dict, List
 import pandas as pd
 import psycopg2.extras
+
 # from configparser import ConfigParser
 from src.twitter_utils import tweet_user_updated,user_tweet_today
 from src.expertai_utils import sentiment
 from src.expertai_utils import resource_concept_score_analysis as rcsa
-
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import logging
 
 logger = logging.getLogger(__name__)
@@ -59,8 +60,10 @@ conn, cursor = conn()
 ###################################################---CREATE---#########################################################
 
 def create_database(db):
-    query = "CREATE DATABASE {db}"
+    conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+    query = "CREATE DATABASE {db};"
     return cursor.execute(query)
+
 
 def create_table():
     """create tables in the PostgreSQL database"""
@@ -93,8 +96,6 @@ def insert_data(id,name,twitter_id):
         return 0
         logger.error(f"{e}- needs to be corrected")
     return 1
-
-# print(insert_data("103","Dalai Lama", "@DalaiLama"))
 
 
 #####################################################---READ---#########################################################
@@ -134,9 +135,6 @@ def update_tweet(twitter_id):
         logger.error(f"{error}")
         return print(error)
     return 1
-
-# print(update_tweet("@ShashiTharoor"))
-# print(update_tweet("@IndianExpress"))
 
 
 def update_tweet_from_ids():
@@ -220,8 +218,6 @@ def read_name_sentiment_add_pattern():
 
     return df
 
-# print(read_name_sentiment_add_pattern().isnull().sum())
-
 
 ###############################################---DELETE---#############################################################
 
@@ -279,8 +275,6 @@ def get_twitter_sentiment_pattern_of_employee(twitter_id,max_tweets):
         return employee
     except Exception as e:
         return e
-
-# print(get_twitter_sentiment_pattern_of_employee("@PMOIndia",max_tweets = 20))
 
 
 #Inserting data using dataframe
